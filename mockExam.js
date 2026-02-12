@@ -61,41 +61,36 @@ const mockExam = {
     updateStreak();
   },
 
-  generateQuestions(count, domain) {
+generateQuestions(count, domain) {
     let sourceQuestions = [];
-
-    if (domain === "all") {
-      const proportions = {
-        general: 0.25,
-        optics: 0.25,
-        dispensing: 0.2,
-        products: 0.2,
-      };
-
-      Object.entries(proportions).forEach(([key, prop]) => {
-        const domainCount = Math.round(count * prop);
-        sourceQuestions.push(
-          ...getRandomQuestions(questionBank[key], domainCount),
-        );
-      });
-
-      while (sourceQuestions.length < count) {
-        const allQuestions = [
-          ...questionBank.general,
-          ...questionBank.optics,
-          ...questionBank.dispensing,
-          ...questionBank.products,
-        ];
-        sourceQuestions.push(
-          allQuestions[Math.floor(Math.random() * allQuestions.length)],
-        );
-      }
+    
+    if (domain === 'all') {
+        const proportions = {
+            general: 0.25,
+            optics: 0.25,
+            dispensing: 0.20,
+            products: 0.20
+        };
+        
+        Object.entries(proportions).forEach(([key, prop]) => {
+            const domainCount = Math.round(count * prop);
+            // Generate unique questions with random values
+            const domainQuestions = generateUniqueQuestions(key, domainCount);
+            sourceQuestions.push(...domainQuestions);
+        });
+        
+        // Fill remaining if needed
+        while (sourceQuestions.length < count) {
+            const randomDomain = randomChoice(['general', 'optics', 'dispensing', 'products']);
+            sourceQuestions.push(...generateUniqueQuestions(randomDomain, 1));
+        }
     } else {
-      sourceQuestions = getRandomQuestions(questionBank[domain], count);
+        // Generate unique questions for specific domain
+        sourceQuestions = generateUniqueQuestions(domain, count);
     }
-
+    
     return shuffleArray(sourceQuestions).slice(0, count);
-  },
+},
 
   startTimer() {
     if (this.state.timerInterval) clearInterval(this.state.timerInterval);
