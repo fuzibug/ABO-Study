@@ -10,32 +10,33 @@ const flashcards = {
   start(domain) {
     this.state.domain = domain;
     const bookmarks = storage.getBookmarks();
-
+    
     let allQ = [];
-
-    if (domain === "bookmarked") {
-      Object.keys(bookmarks).forEach((key) => {
-        const [dom, idx] = key.split("-");
-        if (bookmarks[key]) allQ.push(questionBank[dom][idx]);
-      });
-
-      if (allQ.length === 0) {
-        alert(
-          "No bookmarked questions yet! Bookmark questions while studying to review them later.",
-        );
-        return;
-      }
+    
+    if (domain === 'bookmarked') {
+        Object.keys(bookmarks).forEach(key => {
+            const [dom, idx] = key.split('-');
+            if (bookmarks[key] && questionBank[dom][idx]) {
+                allQ.push(questionBank[dom][idx]);
+            }
+        });
+        
+        if (allQ.length === 0) {
+            alert('No bookmarked questions yet! Bookmark questions while studying to review them later.');
+            return;
+        }
     } else {
-      allQ = getQuestionsFromDomain(domain);
+        // Generate unique questions with random values
+        allQ = generateUniqueQuestions(domain, 30);
     }
-
+    
     this.state.questions = shuffleArray([...allQ]);
     this.state.currentIndex = 0;
-
-    document.getElementById("flashcardContainer").style.display = "block";
+    
+    document.getElementById('flashcardContainer').style.display = 'block';
     this.load();
     updateStreak();
-  },
+},
 
   load() {
     const q = this.state.questions[this.state.currentIndex];
