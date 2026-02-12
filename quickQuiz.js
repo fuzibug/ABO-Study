@@ -9,18 +9,19 @@ const quickQuiz = {
   },
 
   start(domain) {
-    const allQ = getQuestionsFromDomain(domain);
-    this.state.questions = shuffleArray([...allQ]).slice(0, 10);
+    // Generate 10 unique questions with random values
+    const allQ = generateUniqueQuestions(domain === 'all' ? 'all' : domain, 10);
+    this.state.questions = shuffleArray([...allQ]);
     this.state.currentIndex = 0;
     this.state.score = 0;
     this.state.answered = false;
-
-    document.getElementById("quickQuizContainer").style.display = "block";
-    document.getElementById("quickQuizResults").style.display = "none";
-
+    
+    document.getElementById('quickQuizContainer').style.display = 'block';
+    document.getElementById('quickQuizResults').style.display = 'none';
+    
     this.loadQuestion();
     updateStreak();
-  },
+},
 
   loadQuestion() {
     const q = this.state.questions[this.state.currentIndex];
