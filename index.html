@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABO Mock Exam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<main class="wrap" id="main-content">
+<div class="hdr">
+  <div class="badge">&#128065; American Board of Opticianry</div>
+  <h1>ABO Mock Exam</h1>
+  <p class="sub">Practice across all official ABO/NCLE content domains</p>
+</div>
+
+<!-- SETUP -->
+<div id="pg-setup" class="page show">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab on" id="t-setup"  role="tab" aria-selected="true"  aria-controls="pg-setup">&#128203; New Exam</button>
+    <button class="tab"    id="t-prog"   role="tab" aria-selected="false" aria-controls="pg-prog">&#128200; Progress</button>
+    <button class="tab"    id="t-appear" role="tab" aria-selected="false" aria-controls="pg-appear">&#127914; Appearance</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#127918; Question Source</div>
+    <div class="mode-row">
+      <div class="mode-text">
+        <div class="mode-label" id="mode-label">Offline Bank</div>
+        <div class="mode-sub" id="mode-sub">90+ verified questions — works without internet</div>
+      </div>
+      <div class="tog-wrap">
+        <span class="tog-lbl active" id="lbl-off">Offline</span>
+        <label class="tog"><input type="checkbox" id="mode-chk"><span class="tog-track"></span></label>
+        <span class="tog-lbl" id="lbl-ai">AI</span>
+      </div>
+    </div>
+
+    <div class="ai-panel" id="ai-panel">
+      <div class="ctitle" style="margin-top:14px">&#127916; AI Provider</div>
+      <div class="provider-grid">
+        <div class="prov-card on" id="prov-groq">
+          <div class="prov-name">Groq</div>
+          <div class="prov-tag">&#9889; Lightning Fast</div>
+          <div class="prov-desc">Dedicated LPU hardware delivers responses in &lt;2 sec. Best for rapid-fire practice. Generous free tier — no credit card required.</div>
+        </div>
+     </div>
+      <!-- file:// CORS warning — shown by JS if needed -->
+      <div class="file-warn" id="file-warn">
+        <div class="file-warn-icon">&#9888;&#65039;</div>
+        <div class="file-warn-body">
+          <strong>Running from file://</strong> — browsers block API calls from local files.
+          The app will try a CORS proxy automatically. If that fails, run a local server:
+          <code>python3 -m http.server 8080</code> then open <code>localhost:8080</code>.
+        </div>
+      </div>
+      <div class="model-section show" id="ms-groq">
+        <div class="models-ctitle">Select Groq Model</div>
+        <div class="model-list" id="ml-groq">
+          <div class="mc on" data-mid="llama-3.3-70b-versatile">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Llama 3.3 70B Versatile</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fast</span><span class="mbadge mb-smart">Best Overall</span></div>
+              <div class="mc-why">Meta's latest flagship on Groq LPU. Excellent clinical reasoning, accurate ABO calculations, reliable JSON. <strong>Best starting choice.</strong></div>
+            </div>
+          </div>
+          <div class="mc" data-mid="meta-llama/llama-4-scout-17b-16e-instruct">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Llama 4 Scout 17B</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fast</span><span class="mbadge mb-reason">Backup</span></div>
+              <div class="mc-why">Meta's Llama 4 Scout — fast and efficient 17B model. Great backup when 3.3 is rate-limited. Strong structured output and optics content.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="qwen/qwen3-32b">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Qwen3 32B</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fast</span></div>
+              <div class="mc-why">Alibaba's Qwen3 32B — excellent JSON schema compliance and strong reasoning. Best alternative when Llama models are rate-limited.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="llama-3.1-8b-instant">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Llama 3.1 8B Instant</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Ultra-Fast</span></div>
+              <div class="mc-why">Meta's fastest model on Groq — sub-second responses. Best for rapid-fire practice sessions. Lighter on expert-level nuance.</div>
+            </div>
+          </div>
+        </div>
+        <div class="api-hint">Get a free Groq key (no card) at <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></div>
+        <div class="api-row" style="margin-top:8px">
+          <input class="api-input" type="password" id="key-groq" placeholder="Groq API key…" autocomplete="off">
+          <button class="api-save" id="save-groq">Save</button>
+        </div>
+        <div class="api-status" id="status-groq"></div>
+      </div>
+
+      <div class="model-section" id="ms-or">
+        <div class="models-ctitle">Select OpenRouter Model</div>
+        <div class="model-list" id="ml-or">
+          <div class="mc on" data-mid="meta-llama/llama-3.3-70b-instruct:free">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Llama 3.3 70B Instruct <span style="color:var(--ok);font-size:10px">(Free)</span></div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-smart">Best Free</span></div>
+              <div class="mc-why">Same Llama 3.3 70B via OpenRouter's routing. Best free option — use when Groq is rate-limited. Excellent ABO domain accuracy.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="deepseek/deepseek-r1-0528:free">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">DeepSeek R1 <span style="color:var(--ok);font-size:10px">(Free)</span></div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-reason">Best for Calc</span></div>
+              <div class="mc-why">Chain-of-thought reasoning model — works step-by-step before answering. Excellent for Prentice's Rule, vergence, and transposition math. Slower but very accurate on calculations.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="google/gemma-3-27b-it:free">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Gemma 3 27B <span style="color:var(--ok);font-size:10px">(Free)</span></div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Reliable</span></div>
+              <div class="mc-why">Google's latest free model. Strong instruction following and clean JSON output. Good at anatomy and pathology content.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="mistralai/mistral-7b-instruct:free">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Mistral 7B Instruct <span style="color:var(--ok);font-size:10px">(Free)</span></div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fastest Free</span></div>
+              <div class="mc-why">Lean 7B — fastest free option on OpenRouter. Capable for foundation/intermediate questions. Limited on expert-level nuance.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="anthropic/claude-3.5-sonnet">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Claude 3.5 Sonnet <span style="color:var(--wrn);font-size:10px">(Paid)</span></div>
+              <div class="mc-badges"><span class="mbadge mb-smart">Most Accurate</span><span class="mbadge mb-paid">~$0.003/q</span></div>
+              <div class="mc-why">Highest ABO content accuracy and nuanced explanations of any model tested. Best for expert/advanced difficulty. Requires OpenRouter credits.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="openai/gpt-4o-mini">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">GPT-4o Mini <span style="color:var(--wrn);font-size:10px">(Paid)</span></div>
+              <div class="mc-badges"><span class="mbadge mb-smart">Reliable</span><span class="mbadge mb-paid">~$0.0002/q</span></div>
+              <div class="mc-why">OpenAI's budget flagship — GPT-4 class reasoning at very low cost. Consistent JSON output, strong at math-heavy and regulation questions.</div>
+            </div>
+          </div>
+        </div>
+        <div class="api-hint">Get an OpenRouter key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> — many models are free with no credits needed.</div>
+        <div class="api-row" style="margin-top:8px">
+          <input class="api-input" type="password" id="key-or" placeholder="OpenRouter API key…" autocomplete="off">
+          <button class="api-save" id="save-or">Save</button>
+        </div>
+        <div class="api-status" id="status-or"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#128218; Content Domain</div>
+    <div class="dgrid" id="domain-grid" role="group" aria-label="Content Domain">
+      <button class="dbtn on" data-d="all"><span class="di">&#128301;</span><div class="dn">All Domains</div><div class="ds">Full ABO blueprint</div></button>
+      <button class="dbtn" data-d="geometric_optics"><span class="di">&#128302;</span><div class="dn">Geometric Optics</div><div class="ds">Light, vergence, refraction</div></button>
+      <button class="dbtn" data-d="ophthalmic_optics"><span class="di">&#128301;</span><div class="dn">Ophthalmic Optics</div><div class="ds">Lens power, prism, Abbe</div></button>
+      <button class="dbtn" data-d="lens_materials"><span class="di">&#128142;</span><div class="dn">Lens Materials</div><div class="ds">CR-39, poly, high-index</div></button>
+      <button class="dbtn" data-d="lens_designs"><span class="di">&#128083;</span><div class="dn">Lens Designs</div><div class="ds">Bifocal, trifocal, PAL</div></button>
+      <button class="dbtn" data-d="coatings"><span class="di">&#10024;</span><div class="dn">Coatings</div><div class="ds">AR, UV, photochromic</div></button>
+      <button class="dbtn" data-d="frame_selection"><span class="di">&#128246;</span><div class="dn">Frames</div><div class="ds">Materials, fit, face shapes</div></button>
+      <button class="dbtn" data-d="measurements"><span class="di">&#128208;</span><div class="dn">Measurements</div><div class="ds">PD, seg height, vertex</div></button>
+      <button class="dbtn" data-d="dispensing"><span class="di">&#128295;</span><div class="dn">Dispensing</div><div class="ds">Fitting, adjusting</div></button>
+      <button class="dbtn" data-d="prescriptions"><span class="di">&#128203;</span><div class="dn">Prescriptions</div><div class="ds">Rx, transposition, tolerances</div></button>
+      <button class="dbtn" data-d="anatomy"><span class="di">&#129514;</span><div class="dn">Ocular Anatomy</div><div class="ds">Eye structures</div></button>
+      <button class="dbtn" data-d="pathology"><span class="di">&#127973;</span><div class="dn">Pathology</div><div class="ds">Cataracts, glaucoma, AMD</div></button>
+      <button class="dbtn" data-d="contact_lenses"><span class="di">&#128065;</span><div class="dn">Contact Lenses</div><div class="ds">Types, Dk/t, fitting</div></button>
+      <button class="dbtn" data-d="regulations"><span class="di">&#9878;</span><div class="dn">Regulations</div><div class="ds">ANSI, Z87.1, FDA</div></button>
+      <button class="dbtn" data-d="safety_eyewear"><span class="di">&#129366;</span><div class="dn">Safety Eyewear</div><div class="ds">Industrial, sports, OSHA</div></button>
+      <button class="dbtn" data-d="low_vision"><span class="di">&#128270;</span><div class="dn">Low Vision</div><div class="ds">Magnifiers, aids</div></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#9889; Difficulty</div>
+    <div class="dfgrid" id="diff-grid" role="group" aria-label="Difficulty">
+      <button class="dfbtn on" data-df="mixed"><div class="dfbadge" style="background:rgba(99,179,237,.1);color:#63b3ed">Mixed</div><div class="dfname">Balanced</div><div class="dfdesc">Real ABO distribution</div></button>
+      <button class="dfbtn" data-df="foundation"><div class="dfbadge" style="background:rgba(104,211,145,.1);color:#68d391">Foundation</div><div class="dfname">Foundational</div><div class="dfdesc">Definitions, basic recall</div></button>
+      <button class="dfbtn" data-df="intermediate"><div class="dfbadge" style="background:rgba(246,173,85,.1);color:#f6ad55">Intermediate</div><div class="dfname">Intermediate</div><div class="dfdesc">Applied, moderate calc</div></button>
+      <button class="dfbtn" data-df="advanced"><div class="dfbadge" style="background:rgba(252,129,129,.1);color:#fc8181">Advanced</div><div class="dfname">Advanced</div><div class="dfdesc">Complex multi-step</div></button>
+      <button class="dfbtn" data-df="expert"><div class="dfbadge" style="background:rgba(183,148,244,.1);color:#b794f4">Expert</div><div class="dfname">Expert</div><div class="dfdesc">Edge cases, nuance</div></button>
+      <button class="dfbtn" data-df="calculations"><div class="dfbadge" style="background:rgba(118,228,247,.1);color:#76e4f7">Calc</div><div class="dfname">Calculations</div><div class="dfdesc">Prentice, vergence, prism</div></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#9881; Settings</div>
+    <div class="sgrid">
+      <div class="sbox">
+        <span class="slabel">Questions</span>
+        <div class="rng-wrap">
+          <input type="range" id="rng-count" min="5" max="50" step="5" value="10">
+          <span class="rng-val" id="rv-count">10</span>
+        </div>
+        <span class="sbox-desc">5 to 50 per session</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Timer Per Question</span>
+        <div class="rng-wrap">
+          <input type="range" id="rng-timer" min="15" max="120" step="15" value="60">
+          <span class="rng-val" id="rv-timer">60s</span>
+        </div>
+        <span class="sbox-desc">When timed mode is enabled</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Explanations</span>
+        <div class="seg" id="seg-explain">
+          <button class="sgbtn on" data-v="immediate">Immediate</button>
+          <button class="sgbtn" data-v="end">At End</button>
+          <button class="sgbtn" data-v="never">Off</button>
+        </div>
+        <span class="sbox-desc">When to show answer rationale</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Mode</span>
+        <div class="seg" id="seg-exammode">
+          <button class="sgbtn on" data-v="practice">Practice</button>
+          <button class="sgbtn" data-v="exam">Exam</button>
+        </div>
+        <span class="sbox-desc" id="exammode-desc">Live score shown</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Timed Mode</span>
+        <div class="tog-row">
+          <span class="tog-state" id="timer-state">Off</span>
+          <label class="tog"><input type="checkbox" id="chk-timer"><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Countdown per question</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Shuffle Answers</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="shuffle-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-shuffle" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Randomize option order</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Domain Tag</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="dtag-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-dtag" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Show domain label on question</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Difficulty Tag</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="dftag-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-dftag" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Show difficulty badge on question</span>
+      </div>
+    </div>
+  </div>
+  <button class="btn-go" id="btn-start" aria-label="Begin Mock Exam">&#9654;&#160;&#160;Begin Mock Exam</button>
+</div>
+
+<!-- PROGRESS -->
+<div id="pg-prog" class="page">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab" id="t-setup2">&#128203; New Exam</button>
+    <button class="tab on" id="t-prog2">&#128200; Progress</button>
+    <button class="tab" id="t-appear2">&#127914; Appearance</button>
+  </div>
+  <div class="card"><div class="ctitle">&#128200; Overall Statistics</div><div class="stat-grid" id="stat-grid"></div></div>
+  <div class="card"><div class="ctitle">&#127919; Domain Performance</div><div class="dom-list" id="prog-doms"></div></div>
+  <div class="card"><div class="ctitle">&#128336; Recent Sessions</div><div class="ses-list" id="ses-list"></div></div>
+  <div style="margin-top:12px;text-align:right"><button class="btn-sec btn-danger" id="btn-clear">&#128465; Reset All Progress</button></div>
+</div>
+
+<!-- APPEARANCE -->
+<div id="pg-appear" class="page">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab" id="t-setup3">&#128203; New Exam</button>
+    <button class="tab" id="t-prog3">&#128200; Progress</button>
+    <button class="tab on" id="t-appear3">&#127914; Appearance</button>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#127914; Color Theme</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Pick a color scheme. Your choice is saved automatically.</p>
+    <div class="theme-swatches" id="theme-swatches"></div>
+    <div style="margin-top:20px;"><div class="mode-row"><div class="mode-text"><div class="mode-label">Dyslexic Font</div><div class="mode-sub">Switches all text to OpenDyslexic</div></div><div class="tog-wrap"><label class="tog"><input type="checkbox" id="chk-dyslexic"><span class="tog-track"></span></label></div></div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#128065; Theme Preview</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px">
+      <div class="res-box"><div class="res-num" style="color:var(--acc)">Aa</div><div class="res-lbl">Accent</div></div>
+      <div class="res-box"><div class="res-num" style="color:var(--ok)">&#10003;</div><div class="res-lbl">Correct</div></div>
+      <div class="res-box"><div class="res-num" style="color:var(--bad)">&#10007;</div><div class="res-lbl">Wrong</div></div>
+    </div>
+    <div class="opt" style="pointer-events:none;margin-bottom:7px"><span class="opt-l">A</span><span>Sample answer option</span></div>
+    <div class="opt ok" style="pointer-events:none;margin-bottom:7px"><span class="opt-l">B</span><span>Correct answer highlight</span></div>
+    <div class="opt bad" style="pointer-events:none"><span class="opt-l">C</span><span>Incorrect answer highlight</span></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="pg-quiz" class="page">
+  <div id="timer-row" class="timer-row" style="display:none">
+    <div class="tnum" id="tnum" aria-live="polite" aria-label="Time remaining">60</div>
+    <div class="tbar"><div class="tbar-fill" id="tbar-fill" style="width:100%"></div></div>
+  </div>
+  <div class="prog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Quiz progress"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div id="qcard" class="card"></div>
+  <div class="qfoot"><button class="btn-sec btn-quit" id="btn-quit" title="Quit exam" style="padding:8px 14px;font-size:12px;">✕ Quit</button>
+    <div class="live" id="live-wrap" aria-live="polite" aria-atomic="true">&#10003;&#160;<span class="live-c" id="live-c">0</span>&#160;&#160;&#10007;&#160;<span class="live-w" id="live-w">0</span>&#160;&#160;<span id="live-p" style="color:var(--tx2)">0/0</span></div>
+    <div class="next-row" id="next-row" style="display:none">
+      <span class="kbd">Space</span>&#160;/&#160;<span class="kbd">&#8594;</span>
+      <button class="btn-sec" id="btn-next">Next &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="pg-results" class="page">
+  <div class="card">
+    <div class="res-hero">
+      <div class="ring" id="result-ring" role="img" aria-label="Score"><div class="ring-num" id="ring-num">-</div><div class="ring-lbl">SCORE</div></div>
+      <div class="res-title" id="res-title">-</div>
+      <div class="res-sub" id="res-sub">-</div>
+      <div class="res-grid">
+        <div class="res-box"><div class="res-num" style="color:var(--ok)" id="rs-c">0</div><div class="res-lbl">Correct</div></div>
+        <div class="res-box"><div class="res-num" style="color:var(--bad)" id="rs-w">0</div><div class="res-lbl">Wrong</div></div>
+        <div class="res-box"><div class="res-num" style="color:var(--acc)" id="rs-t">0</div><div class="res-lbl">Total</div></div>
+        <div class="res-box"><div class="res-num" style="color:var(--wrn)" id="rs-time">-</div><div class="res-lbl">Avg Time</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="ctitle">&#128202; Domain Breakdown</div><div class="dom-list" id="res-doms"></div></div>
+  <div class="card"><div class="ctitle">&#128214; Review All Questions</div><div class="rev-list" id="rev-list"></div></div>
+  <div class="act-row">
+    <button class="btn-sec" id="btn-new">&#8592; New Exam</button>
+    <button class="btn-go" id="btn-retry" style="display:none">&#8635; Retry Incorrect</button>
+  </div>
+</div>
+
+</main><!-- /wrap -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ═══════════════════════════════════════
+       JS — load order matters:
+         1. constants   (lookup tables, no deps)
+         2. state       (shared vars, no deps)
+         3. data        (BANK array, no deps)
+         4. ui          (DOM helpers, reads state/constants)
+         5. quiz        (quiz engine, reads all above)
+         6. api         (AI fetch, reads state/constants/quiz)
+         7. progress    (storage, reads state/constants)
+       ═══════════════════════════════════════ -->
+  <script src="js/constants.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/progress.js"></script>
+
+  <!-- Boot: wire up all UI interactions once DOM is ready -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      initUI();
+    });
+  </script>
+
+</body>
+</html>
