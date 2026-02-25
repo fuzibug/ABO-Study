@@ -1,7 +1,12 @@
-// ABO Question Bank — 75 verified questions across all 15 domains
+// ABO Question Bank — Enhanced Dynamic Generation System
+// Original 75 verified questions + dynamic generators for infinite variety
 // Sources: ABO Study Guide, ANSI Z80.1-2022, ANSI Z87.1, 21 CFR 801.410, OSHA 29 CFR 1910.133
 
-const BANK = [
+// ═══════════════════════════════════════════════════════════════════════════════
+// PART 1: ORIGINAL STATIC QUESTION BANK (75 questions)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const BANK_STATIC = [
   {"domain":"geometric_optics","difficulty":"foundation","question":"What is vergence?","options":["The bending of light at a lens surface","The reciprocal of object or image distance in meters","The speed of light in a medium","The angle of incidence"],"correct":1,"explanation":"Vergence (L) = n/l. Describes whether rays converge (+) or diverge (-), in diopters. Object vergence is always negative (diverging from source).","source":"ABO Study Guide: Geometric Optics — Vergence"},
   {"domain":"geometric_optics","difficulty":"foundation","question":"Snell's Law states:","options":["Frequency changes at an interface","n1·sinθ1 = n2·sinθ2","Speed is constant in all media","Wavelength is preserved across boundaries"],"correct":1,"explanation":"n1·sinθ1 = n2·sinθ2. Light bends toward the normal entering a denser medium. Frequency never changes; wavelength and speed do.","source":"ABO: Geometric Optics — Refraction / Snell's Law"},
   {"domain":"geometric_optics","difficulty":"intermediate","question":"A lens has a focal length of 0.25 m. Its power is:","options":["+0.25 D","+2.50 D","+4.00 D","+25.00 D"],"correct":2,"explanation":"Power (D) = 1/f(m) = 1/0.25 = +4.00 D. Fundamental diopter definition.","source":"ABO: Geometric Optics — Lens Power"},
@@ -76,3 +81,531 @@ const BANK = [
   {"domain":"low_vision","difficulty":"intermediate","question":"Eccentric viewing teaches patients to:","options":["Use only one eye for reading","Fixate off-center to use healthy retinal cells outside a central scotoma","Use a mirror to redirect images","Tilt reading material"],"correct":1,"explanation":"Eccentric viewing (EV): patients with central scotomas (e.g., AMD) learn to fixate with a Preferred Retinal Locus (PRL) — healthy peripheral retina adjacent to the scotoma.","source":"ABO: Low Vision — Eccentric Viewing & PRL"},
   {"domain":"low_vision","difficulty":"intermediate","question":"Patient with 20/100 BCVA reading at 40 cm. Required add power:","options":["+2.50 D","+5.00 D","+10.00 D","+12.50 D"],"correct":3,"explanation":"Step 1: Magnification needed = 100/20 = 5×. Step 2: Base add for 40cm = 1/0.40 = +2.50D. Step 3: Total add = 5 × 2.50 = +12.50 D.","source":"ABO: Low Vision — Reading Add Calculation"}
 ];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PART 2: DYNAMIC QUESTION GENERATORS (infinite variations)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Helper: format diopter power with sign
+function fmtD(val) {
+  return (val >= 0 ? '+' : '') + val.toFixed(2);
+}
+
+// Helper: format distance in cm or m
+function fmtDist(cm) {
+  return cm >= 100 ? (cm/100).toFixed(2) + ' m' : cm + ' cm';
+}
+
+// Helper: shuffle array
+function shuffle(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// Helper: random choice from array
+function choice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Helper: random integer between min and max (inclusive)
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Helper: random float
+function randFloat(min, max, decimals = 2) {
+  const val = Math.random() * (max - min) + min;
+  return parseFloat(val.toFixed(decimals));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GENERATOR FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// 1. PRENTICE'S RULE GENERATOR — infinite variations
+const genPrentice = () => {
+  const powers = [-8.00, -6.00, -5.00, -4.00, -3.00, -2.50, 2.50, 3.00, 4.00, 5.00, 6.00, 8.00];
+  const power = choice(powers);
+  const decentMM = randInt(3, 12);
+  const decentCM = decentMM / 10;
+  
+  const prism = Math.abs(power * decentCM);
+  
+  // Determine direction based on power sign and decentration direction
+  const isPlusPower = power > 0;
+  const directions = ['below', 'above', 'temporal to', 'nasal to'];
+  const dir = choice(directions);
+  
+  let baseDir;
+  if (dir === 'below') baseDir = isPlusPower ? 'BU' : 'BD';
+  else if (dir === 'above') baseDir = isPlusPower ? 'BD' : 'BU';
+  else if (dir === 'temporal to') baseDir = isPlusPower ? 'BO' : 'BI';
+  else baseDir = isPlusPower ? 'BI' : 'BO';
+  
+  const correctAnswer = prism.toFixed(1) + 'Δ ' + baseDir;
+  
+  // Generate plausible wrong answers
+  const wrongPrisms = [
+    (prism * 0.5).toFixed(1),
+    (prism * 1.5).toFixed(1),
+    (prism * 2).toFixed(1)
+  ];
+  const wrongDirs = ['BU', 'BD', 'BI', 'BO'].filter(d => d !== baseDir);
+  
+  const options = shuffle([
+    correctAnswer,
+    wrongPrisms[0] + 'Δ ' + baseDir,
+    prism.toFixed(1) + 'Δ ' + choice(wrongDirs),
+    wrongPrisms[1] + 'Δ ' + choice(wrongDirs)
+  ]);
+  
+  return {
+    domain: 'geometric_optics',
+    difficulty: 'intermediate',
+    question: `Prentice's Rule: prism induced ${decentMM} mm ${dir} the OC of a ${fmtD(power)} D lens:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `P = F × d(cm) = ${Math.abs(power).toFixed(2)} × ${decentCM.toFixed(1)} = ${prism.toFixed(1)}Δ. ${isPlusPower ? 'Plus' : 'Minus'} lens displaced ${dir} = ${baseDir} prism (base ${baseDir === 'BU' ? 'up' : baseDir === 'BD' ? 'down' : baseDir === 'BI' ? 'in' : 'out'}).`,
+    source: 'ABO: Geometric Optics — Prentice\'s Rule P=Fd'
+  };
+};
+
+// 2. TRANSPOSITION GENERATOR — plus to minus and minus to plus
+const genTransposition = () => {
+  const spheres = [-4.00, -3.00, -2.00, -1.00, -0.50, +0.50, +1.00, +2.00, +3.00, +4.00];
+  const cylinders = [-3.00, -2.50, -2.00, -1.50, -1.00, -0.50];
+  const axes = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
+  
+  const sph = choice(spheres);
+  const cyl = choice(cylinders);
+  const axis = choice(axes);
+  
+  // Transpose: new sphere = sph + cyl, new cyl = -cyl, new axis = axis ± 90
+  const newSph = sph + cyl;
+  const newCyl = -cyl;
+  const newAxis = (axis + 90) % 180 || 180;
+  
+  const correctAnswer = `${fmtD(newSph)} ${fmtD(newCyl)} x ${String(newAxis).padStart(3, '0')}`;
+  
+  // Generate wrong answers
+  const wrongOptions = [
+    `${fmtD(sph)} ${fmtD(newCyl)} x ${String(newAxis).padStart(3, '0')}`, // forgot to add cyl to sphere
+    `${fmtD(newSph)} ${fmtD(cyl)} x ${String(newAxis).padStart(3, '0')}`, // forgot to flip cyl sign
+    `${fmtD(newSph)} ${fmtD(newCyl)} x ${String(axis).padStart(3, '0')}` // forgot to rotate axis
+  ];
+  
+  const options = shuffle([correctAnswer, ...wrongOptions]);
+  
+  return {
+    domain: 'prescriptions',
+    difficulty: 'foundation',
+    question: `Transpose ${fmtD(sph)} ${fmtD(cyl)} x ${String(axis).padStart(3, '0')} to ${cyl < 0 ? 'plus' : 'minus'} cylinder form:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `New sphere = ${fmtD(sph)} + (${fmtD(cyl)}) = ${fmtD(newSph)}. New cylinder = ${fmtD(newCyl)}. New axis = ${axis} ${cyl < 0 ? '+' : '-'} 90 = ${newAxis}. Result: ${correctAnswer}.`,
+    source: 'ABO: Prescriptions — Rx Transposition'
+  };
+};
+
+// 3. SPHERICAL EQUIVALENT GENERATOR
+const genSphericalEquiv = () => {
+  const spheres = [-4.00, -3.00, -2.00, -1.00, +1.00, +2.00, +3.00, +4.00];
+  const cylinders = [-3.00, -2.50, -2.00, -1.50, -1.00, -0.50, +0.50, +1.00, +1.50];
+  const axes = [45, 90, 135, 180];
+  
+  const sph = choice(spheres);
+  const cyl = choice(cylinders);
+  const axis = choice(axes);
+  
+  const se = sph + (cyl / 2);
+  const correctAnswer = `${fmtD(se)} DS`;
+  
+  // Generate wrong answers
+  const wrongOptions = [
+    `${fmtD(sph)} DS`, // forgot to add cyl/2
+    `${fmtD(sph + cyl)} DS`, // added full cyl instead of half
+    `${fmtD(se + 0.50)} DS` // off by common error
+  ];
+  
+  const options = shuffle([correctAnswer, ...wrongOptions]);
+  
+  return {
+    domain: 'prescriptions',
+    difficulty: 'foundation',
+    question: `Spherical equivalent of ${fmtD(sph)} ${fmtD(cyl)} x ${String(axis).padStart(3, '0')}:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `SE = sphere + (cylinder/2) = ${fmtD(sph)} + (${fmtD(cyl)}/2) = ${fmtD(sph)} + ${fmtD(cyl/2)} = ${fmtD(se)} DS. Used for contact lens power approximation.`,
+    source: 'ABO: Prescriptions — Spherical Equivalent'
+  };
+};
+
+// 4. FOCAL LENGTH TO POWER GENERATOR
+const genFocalLength = () => {
+  const focalLengths = [0.125, 0.20, 0.25, 0.33, 0.40, 0.50, 0.67, 1.00, 2.00];
+  const f = choice(focalLengths);
+  const power = 1 / f;
+  
+  const correctAnswer = `${fmtD(power)} D`;
+  
+  // Generate wrong answers
+  const wrongOptions = [
+    `${fmtD(f)} D`, // inverted formula
+    `${fmtD(power * 2)} D`, // doubled
+    `${fmtD(power / 2)} D` // halved
+  ];
+  
+  const options = shuffle([correctAnswer, ...wrongOptions]);
+  
+  return {
+    domain: 'geometric_optics',
+    difficulty: 'intermediate',
+    question: `A lens has a focal length of ${f.toFixed(2)} m. Its power is:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `Power (D) = 1/f(m) = 1/${f.toFixed(2)} = ${fmtD(power)} D. Fundamental diopter definition.`,
+    source: 'ABO: Geometric Optics — Lens Power'
+  };
+};
+
+// 5. CRITICAL ANGLE GENERATOR
+const genCriticalAngle = () => {
+  const materials = [
+    {name: 'crown glass', n: 1.523},
+    {name: 'CR-39', n: 1.498},
+    {name: 'polycarbonate', n: 1.586},
+    {name: 'high-index 1.67', n: 1.67}
+  ];
+  
+  const mat = choice(materials);
+  const n1 = mat.n;
+  const n2 = 1.0; // air
+  
+  const criticalAngle = Math.asin(n2 / n1) * (180 / Math.PI);
+  const roundedAngle = Math.round(criticalAngle);
+  
+  const correctAnswer = `${roundedAngle}°`;
+  
+  // Generate wrong answers
+  const wrongAngles = [
+    roundedAngle - 10,
+    roundedAngle + 8,
+    roundedAngle + 18
+  ].map(a => `${a}°`);
+  
+  const options = shuffle([correctAnswer, ...wrongAngles]);
+  
+  return {
+    domain: 'geometric_optics',
+    difficulty: 'advanced',
+    question: `Critical angle for ${mat.name} (n=${mat.n.toFixed(3)}) to air (n=1.0) is approximately:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `θc = arcsin(n2/n1) = arcsin(1.0/${mat.n.toFixed(3)}) ≈ ${criticalAngle.toFixed(1)}°. Beyond this, total internal reflection occurs — no light exits the denser medium.`,
+    source: 'ABO: Geometric Optics — Total Internal Reflection'
+  };
+};
+
+// 6. MINIMUM BLANK SIZE GENERATOR
+const genBlankSize = () => {
+  const A = randInt(48, 58);
+  const DBL = randInt(14, 20);
+  const decentPerEye = randFloat(0.5, 6.0, 1);
+  
+  const minBlank = A + DBL + (2 * decentPerEye);
+  const correctAnswer = `${minBlank.toFixed(1)} mm`;
+  
+  // Generate wrong answers
+  const wrongOptions = [
+    `${(A + DBL).toFixed(1)} mm`, // forgot decentration
+    `${(A + decentPerEye).toFixed(1)} mm`, // forgot DBL
+    `${(minBlank + 5).toFixed(1)} mm` // added arbitrary buffer
+  ];
+  
+  const options = shuffle([correctAnswer, ...wrongOptions]);
+  
+  return {
+    domain: 'frame_selection',
+    difficulty: 'intermediate',
+    question: `Frame with A=${A}mm, DBL=${DBL}mm, and largest decentration ${decentPerEye.toFixed(1)}mm. Minimum blank size:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `Minimum blank size = A + DBL + (2 × largest decentration) = ${A} + ${DBL} + (2 × ${decentPerEye.toFixed(1)}) = ${minBlank.toFixed(1)} mm. Ensures blank covers full lens opening after edging.`,
+    source: 'ABO: Frame Selection — Blank Size Calculation'
+  };
+};
+
+// 7. LOW VISION MAGNIFICATION GENERATOR
+const genLowVisionMag = () => {
+  const currentVAs = [20, 30, 40, 50, 60, 80, 100, 120, 160, 200, 400];
+  const targetVAs = [20, 25, 30, 40];
+  
+  const current = choice(currentVAs);
+  const target = choice(targetVAs.filter(t => t < current));
+  
+  const mag = current / target;
+  const correctAnswer = `${mag.toFixed(1)}×`;
+  
+  // Generate wrong answers
+  const wrongMags = [
+    (mag / 2).toFixed(1),
+    (mag * 1.5).toFixed(1),
+    (target / current).toFixed(1) // inverted
+  ].map(m => `${m}×`);
+  
+  const options = shuffle([correctAnswer, ...wrongMags]);
+  
+  return {
+    domain: 'low_vision',
+    difficulty: 'intermediate',
+    question: `Patient with 20/${current} BCVA needs to read 20/${target} print. Required magnification:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `Magnification = denominator of current VA ÷ denominator of target VA = ${current} ÷ ${target} = ${mag.toFixed(1)}×.`,
+    source: 'ABO: Low Vision — Magnification Calculation'
+  };
+};
+
+// 8. MERIDIONAL POWER GENERATOR
+const genMeridionalPower = () => {
+  const spheres = [-5.00, -4.00, -3.00, -2.00, -1.00, +1.00, +2.00, +3.00];
+  const cylinders = [-3.00, -2.50, -2.00, -1.50, -1.00];
+  const axis = choice([90, 180]);
+  
+  const sph = choice(spheres);
+  const cyl = choice(cylinders);
+  
+  // Power at axis meridian = sphere
+  // Power at 90° from axis = sphere + cylinder
+  const queryMeridian = axis === 180 ? 90 : 180;
+  const powerAtQuery = queryMeridian === axis ? sph : sph + cyl;
+  
+  const correctAnswer = `${fmtD(powerAtQuery)} D`;
+  
+  // Generate wrong answers
+  const wrongOptions = [
+    `${fmtD(sph)} D`,
+    `${fmtD(cyl)} D`,
+    `${fmtD(sph + cyl/2)} D`
+  ].filter(o => o !== correctAnswer);
+  
+  const options = shuffle([correctAnswer, ...wrongOptions.slice(0, 3)]);
+  
+  return {
+    domain: 'prescriptions',
+    difficulty: 'advanced',
+    question: `For ${fmtD(sph)} ${fmtD(cyl)} x ${String(axis).padStart(3, '0')}, power at the ${queryMeridian}° meridian:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `Minus cylinder: sphere acts at axis meridian (${axis}°). Power at ${queryMeridian}° = sphere + cylinder = ${fmtD(sph)} + (${fmtD(cyl)}) = ${fmtD(powerAtQuery)} D. Power at ${axis}° = ${fmtD(sph)} D.`,
+    source: 'ABO: Prescriptions — Meridional Power / Power Cross'
+  };
+};
+
+// 9. LENS MATERIAL THICKNESS COMPARISON
+const genLensMaterialThickness = () => {
+  const powers = [-8.00, -7.00, -6.00, -5.00, +5.00, +6.00, +7.00, +8.00];
+  const power = choice(powers);
+  const isMinus = power < 0;
+  
+  const materials = [
+    {name: 'CR-39 n=1.50', n: 1.498, order: 4},
+    {name: 'Crown glass n=1.523', n: 1.523, order: 3},
+    {name: 'Polycarbonate n=1.586', n: 1.586, order: 2},
+    {name: 'High-index 1.67', n: 1.67, order: 1}
+  ];
+  
+  // For minus: higher index = thinner edges (lower order = thinner)
+  // For plus: higher index = thinner center (lower order = thinner)
+  const sorted = materials.sort((a, b) => a.order - b.order);
+  const thinnest = sorted[0];
+  
+  const correctAnswer = thinnest.name;
+  const wrongOptions = materials.filter(m => m.name !== correctAnswer).map(m => m.name);
+  
+  const options = shuffle([correctAnswer, ...wrongOptions]);
+  
+  return {
+    domain: 'lens_materials',
+    difficulty: 'intermediate',
+    question: `For ${fmtD(power)} DS, thinnest ${isMinus ? 'edge' : 'center'} lens material:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `Higher index = thinner ${isMinus ? 'edge' : 'center'} for ${isMinus ? 'minus' : 'plus'} lenses. Ranking thinnest to thickest: 1.67 > 1.586 (PC) > 1.523 (glass) > 1.498 (CR-39).`,
+    source: 'ABO: Lens Materials — High-Index / Thickness'
+  };
+};
+
+// 10. LOW VISION READING ADD GENERATOR
+const genLowVisionReadingAdd = () => {
+  const currentVAs = [60, 80, 100, 120, 160, 200];
+  const targetVA = 20;
+  const workingDistCM = choice([25, 33, 40, 50]);
+  
+  const current = choice(currentVAs);
+  const mag = current / targetVA;
+  const baseAdd = 100 / workingDistCM;
+  const totalAdd = mag * baseAdd;
+  
+  const correctAnswer = `${fmtD(totalAdd)} D`;
+  
+  // Generate wrong answers
+  const wrongAdds = [
+    baseAdd.toFixed(2),
+    (totalAdd / 2).toFixed(2),
+    (mag).toFixed(2)
+  ].map(a => fmtD(parseFloat(a)) + ' D');
+  
+  const options = shuffle([correctAnswer, ...wrongAdds]);
+  
+  return {
+    domain: 'low_vision',
+    difficulty: 'intermediate',
+    question: `Patient with 20/${current} BCVA reading at ${workingDistCM} cm. Required add power:`,
+    options: options,
+    correct: options.indexOf(correctAnswer),
+    explanation: `Step 1: Magnification needed = ${current}/${targetVA} = ${mag.toFixed(1)}×. Step 2: Base add for ${workingDistCM}cm = 100/${workingDistCM} = ${fmtD(baseAdd)} D. Step 3: Total add = ${mag.toFixed(1)} × ${baseAdd.toFixed(2)} = ${fmtD(totalAdd)} D.`,
+    source: 'ABO: Low Vision — Reading Add Calculation'
+  };
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GENERATOR REGISTRY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const GENERATORS = [
+  {weight: 3, fn: genPrentice},
+  {weight: 3, fn: genTransposition},
+  {weight: 2, fn: genSphericalEquiv},
+  {weight: 2, fn: genFocalLength},
+  {weight: 1, fn: genCriticalAngle},
+  {weight: 2, fn: genBlankSize},
+  {weight: 2, fn: genLowVisionMag},
+  {weight: 2, fn: genMeridionalPower},
+  {weight: 2, fn: genLensMaterialThickness},
+  {weight: 2, fn: genLowVisionReadingAdd}
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PART 3: INTEGRATION & SMART SELECTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Track recently seen questions to avoid immediate repeats
+let recentQuestionHashes = [];
+const MAX_RECENT_MEMORY = 50;
+
+// Hash function to identify unique question content
+function hashQuestion(q) {
+  return q.question.substring(0, 50) + q.domain + q.difficulty;
+}
+
+// Generate a dynamic question from weighted generator pool
+function generateDynamicQuestion() {
+  // Calculate total weight
+  const totalWeight = GENERATORS.reduce((sum, g) => sum + g.weight, 0);
+  let rand = Math.random() * totalWeight;
+  
+  // Select generator based on weights
+  for (const gen of GENERATORS) {
+    rand -= gen.weight;
+    if (rand <= 0) {
+      return gen.fn();
+    }
+  }
+  
+  // Fallback
+  return GENERATORS[0].fn();
+}
+
+// Main bank builder: combines static + dynamic with smart deduplication
+function buildQuestionBank(config) {
+  const {
+    domain = 'all',
+    difficulty = 'mixed',
+    count = 10,
+    dynamicRatio = 0.4 // 40% dynamic, 60% static by default
+  } = config;
+  
+  let pool = [];
+  
+  // Filter static questions by domain and difficulty
+  let staticPool = BANK_STATIC.filter(q => {
+    const domainMatch = domain === 'all' || q.domain === domain;
+    const diffMatch = difficulty === 'mixed' || 
+                      difficulty === 'calculations' ||
+                      q.difficulty === difficulty;
+    return domainMatch && diffMatch;
+  });
+  
+  // Shuffle static pool
+  staticPool = shuffle(staticPool);
+  
+  // Calculate how many dynamic vs static questions
+  const dynamicCount = Math.floor(count * dynamicRatio);
+  const staticCount = count - dynamicCount;
+  
+  // Add static questions
+  for (let i = 0; i < Math.min(staticCount, staticPool.length); i++) {
+    pool.push(staticPool[i]);
+  }
+  
+  // Generate dynamic questions
+  let attempts = 0;
+  const maxAttempts = dynamicCount * 5; // prevent infinite loop
+  
+  while (pool.length < count && attempts < maxAttempts) {
+    const dynQ = generateDynamicQuestion();
+    
+    // Check domain and difficulty filters
+    const domainMatch = domain === 'all' || dynQ.domain === domain;
+    const diffMatch = difficulty === 'mixed' || 
+                      difficulty === 'calculations' ||
+                      dynQ.difficulty === difficulty;
+    
+    if (domainMatch && diffMatch) {
+      // Check if this question is too similar to recent ones
+      const qHash = hashQuestion(dynQ);
+      if (!recentQuestionHashes.includes(qHash)) {
+        pool.push(dynQ);
+        recentQuestionHashes.push(qHash);
+        
+        // Trim memory
+        if (recentQuestionHashes.length > MAX_RECENT_MEMORY) {
+          recentQuestionHashes.shift();
+        }
+      }
+    }
+    
+    attempts++;
+  }
+  
+  // Fill remaining slots with static if needed
+  let staticIdx = staticCount;
+  while (pool.length < count && staticIdx < staticPool.length) {
+    pool.push(staticPool[staticIdx]);
+    staticIdx++;
+  }
+  
+  return shuffle(pool);
+}
+
+// Export the main BANK array using the builder
+// This maintains compatibility with existing quiz.js code
+const BANK = buildQuestionBank({
+  domain: 'all',
+  difficulty: 'mixed',
+  count: 100, // build a large pool
+  dynamicRatio: 0.4
+});
+
+// Export builder for custom quiz configurations
+window.buildQuestionBank = buildQuestionBank;
+
+console.log(`📚 Enhanced Question Bank initialized: ${BANK.length} questions loaded`);
+console.log(`   - ${BANK_STATIC.length} static base questions`);
+console.log(`   - ${GENERATORS.length} dynamic generators available`);
+console.log(`   - Infinite unique questions possible via generators`);
