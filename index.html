@@ -163,6 +163,41 @@
         </div>
         <div class="api-status" id="status-or"></div>
       </div>
+      
+      <!-- AI SETTINGS SECTION -->
+      <div class="card" style="margin-top:16px;background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.15)">
+        <div class="ctitle">⚙️ AI Generation Settings</div>
+        <p style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Fine-tune how the AI generates questions. Changes apply to next generation.</p>
+        
+        <div class="sgrid" style="grid-template-columns:1fr;gap:16px">
+          <div class="sbox">
+            <span class="slabel">Temperature (Creativity)</span>
+            <div class="rng-wrap">
+              <input type="range" id="rng-ai-temp" min="0.3" max="1.2" step="0.1" value="0.8">
+              <span class="rng-val" id="rv-ai-temp">0.8</span>
+            </div>
+            <span class="sbox-desc">Low (0.3-0.5) = consistent, predictable | High (0.9-1.2) = creative, varied</span>
+          </div>
+          
+          <div class="sbox">
+            <span class="slabel">Max Tokens (Response Length)</span>
+            <div class="rng-wrap">
+              <input type="range" id="rng-ai-tokens" min="2048" max="16384" step="2048" value="8192">
+              <span class="rng-val" id="rv-ai-tokens">8192</span>
+            </div>
+            <span class="sbox-desc">Higher = longer responses (prevents cut-off), but slower & more expensive</span>
+          </div>
+        </div>
+        
+        <div style="margin-top:12px;padding:10px;background:rgba(99,179,237,.05);border:1px solid rgba(99,179,237,.15);border-radius:6px;font-size:11px;color:var(--tx2);line-height:1.6">
+          <strong style="color:var(--acc)">💡 Tips:</strong><br>
+          • <strong>Temperature 0.8</strong> (default) balances accuracy with variety<br>
+          • Increase to <strong>1.0-1.2</strong> if questions feel repetitive<br>
+          • Decrease to <strong>0.3-0.5</strong> for maximum factual consistency<br>
+          • <strong>8192 tokens</strong> is ideal for 10-20 questions<br>
+          • Increase tokens if seeing truncated/incomplete questions
+        </div>
+      </div>
     </div>
   </div>
 
