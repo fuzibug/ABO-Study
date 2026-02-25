@@ -54,6 +54,16 @@ function buildSystemPrompt() {
     '- Normal IOP: 10-21 mmHg; Fovea: cones only, avascular',
     '- Corneal layers anterior→posterior: Epithelium, Bowman\'s, Stroma (90%), Descemet\'s, Endothelium',
     '',
+    'MAXIMIZE VARIATION:',
+    '- Use DIVERSE numerical values — avoid clustering around common values like ±2.00 or 90°',
+    '- Prentice\'s Rule: powers from -10.00 to +10.00, decentrations 2-15mm, all directions',
+    '- Transposition: use uncommon but valid axes (15°, 35°, 75°, 105°, 165°, not just 90°/180°)',
+    '- Prescriptions: combine unusual sphere/cylinder pairs, use full axis range 0-180°',
+    '- Low vision: vary working distances (25cm, 33cm, 40cm, 50cm, 67cm)',
+    '- Frame measurements: use realistic but varied A measurements (46-60mm), DBL (14-22mm)',
+    '- Alternate question formats: direct questions, clinical scenarios, problem-solving, "what if" cases',
+    '- Mix calculation-heavy with conceptual/recognition questions in each batch',
+    '',
     'RULES:',
     '- Exactly 4 options per question, exactly 1 correct answer',
     '- All wrong options must be clinically plausible (not obviously wrong)',
@@ -94,10 +104,23 @@ function buildUserPrompt() {
     expert:       'ONLY expert level — edge cases, rarely-tested nuance, exception conditions',
     calculations: 'ONLY calculation-heavy questions — must include Prentice\'s Rule, vergence, transposition, spherical equivalent, magnification, or blank size math',
   };
+  
+  // Add randomization elements to increase variety each generation
+  var emphasisOptions = [
+    'Focus on unusual numerical combinations and edge cases.',
+    'Emphasize clinical troubleshooting scenarios.',
+    'Include questions testing conceptual understanding beyond memorization.',
+    'Mix direct calculation problems with applied clinical scenarios.',
+    'Use diverse patient demographics and real-world dispensing situations.',
+  ];
+  var randomEmphasis = emphasisOptions[Math.floor(Math.random() * emphasisOptions.length)];
+  
   return [
     'Generate exactly ' + selCount + ' ABO exam questions about ' + (domMap[selDomain] || domMap.all) + ',',
     'at ' + (diffMap[selDiff] || diffMap.mixed) + ' difficulty.',
-    'Include at least one calculation question if the domain permits.',
+    randomEmphasis,
+    'Ensure this batch is DISTINCT from typical question patterns — vary numerical values widely,',
+    'use uncommon but valid parameter combinations, and alternate question presentation styles.',
     'All numerical values must be clinically accurate per the ABO Study Guide.',
     'No duplicate topics. Return raw JSON only.',
   ].join(' ');
@@ -159,7 +182,7 @@ function loadAI() {
       { role: 'system', content: buildSystemPrompt() },
       { role: 'user',   content: buildUserPrompt()   },
     ],
-    temperature: 0.55,
+    temperature: 0.78,
     max_tokens: selModel.includes('llama') ? 8192 : 4096,
     stream:      false,
   };
