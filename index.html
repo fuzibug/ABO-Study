@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/appearance.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a>
@@ -292,12 +293,97 @@
     <button class="tab" id="t-prog3">&#128200; Progress</button>
     <button class="tab on" id="t-appear3">&#127914; Appearance</button>
   </div>
+  
   <div class="card">
-    <div class="ctitle">&#127914; Color Theme</div>
+    <div class="ctitle">&#127912; Color Theme</div>
     <p style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Pick a color scheme. Your choice is saved automatically.</p>
     <div class="theme-swatches" id="theme-swatches"></div>
-    <div style="margin-top:20px;"><div class="mode-row"><div class="mode-text"><div class="mode-label">Dyslexic Font</div><div class="mode-sub">Switches all text to OpenDyslexic</div></div><div class="tog-wrap"><label class="tog"><input type="checkbox" id="chk-dyslexic"><span class="tog-track"></span></label></div></div></div>
   </div>
+  
+  <div class="card">
+    <div class="ctitle">&#128065; Font & Display</div>
+    <div class="sgrid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+      <div class="sbox">
+        <span class="slabel">Dyslexic Font</span>
+        <div class="tog-row">
+          <span class="tog-state" id="dyslexic-state">Off</span>
+          <label class="tog"><input type="checkbox" id="chk-dyslexic"><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">OpenDyslexic typeface</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Font Size</span>
+        <div class="rng-wrap">
+          <input type="range" id="rng-fontsize" min="90" max="130" step="10" value="100">
+          <span class="rng-val" id="rv-fontsize">100%</span>
+        </div>
+        <span class="sbox-desc">Base text size adjustment</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Line Height</span>
+        <div class="seg" id="seg-lineheight">
+          <button class="sgbtn" data-v="compact">Compact</button>
+          <button class="sgbtn on" data-v="normal">Normal</button>
+          <button class="sgbtn" data-v="relaxed">Relaxed</button>
+        </div>
+        <span class="sbox-desc">Text spacing preference</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Letter Spacing</span>
+        <div class="seg" id="seg-letterspacing">
+          <button class="sgbtn on" data-v="normal">Normal</button>
+          <button class="sgbtn" data-v="wide">Wide</button>
+        </div>
+        <span class="sbox-desc">Character spacing</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">&#9881; Interface Options</div>
+    <div class="sgrid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+      <div class="sbox">
+        <span class="slabel">Animations</span>
+        <div class="seg" id="seg-animations">
+          <button class="sgbtn" data-v="none">None</button>
+          <button class="sgbtn on" data-v="reduced">Reduced</button>
+          <button class="sgbtn" data-v="full">Full</button>
+        </div>
+        <span class="sbox-desc">Visual motion effects</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Contrast</span>
+        <div class="seg" id="seg-contrast">
+          <button class="sgbtn on" data-v="normal">Normal</button>
+          <button class="sgbtn" data-v="high">High</button>
+        </div>
+        <span class="sbox-desc">Color intensity</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Focus Indicators</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="focus-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-focus" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Keyboard navigation aids</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Sound Effects</span>
+        <div class="tog-row">
+          <span class="tog-state" id="sound-state">Off</span>
+          <label class="tog"><input type="checkbox" id="chk-sound"><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Audio feedback (future)</span>
+      </div>
+    </div>
+  </div>
+  
   <div class="card">
     <div class="ctitle">&#128065; Theme Preview</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px">
@@ -308,6 +394,12 @@
     <div class="opt" style="pointer-events:none;margin-bottom:7px"><span class="opt-l">A</span><span>Sample answer option</span></div>
     <div class="opt ok" style="pointer-events:none;margin-bottom:7px"><span class="opt-l">B</span><span>Correct answer highlight</span></div>
     <div class="opt bad" style="pointer-events:none"><span class="opt-l">C</span><span>Incorrect answer highlight</span></div>
+  </div>
+  
+  <div class="card" style="background:rgba(99,179,237,.04);border-color:rgba(99,179,237,.2)">
+    <div style="font-size:12px;color:var(--tx2);line-height:1.7;">
+      <strong style="color:var(--acc)">&#128161; Tip:</strong> All appearance settings are saved automatically and persist across sessions. Changes take effect immediately.
+    </div>
   </div>
 </div>
 
@@ -363,6 +455,7 @@
          5. quiz        (quiz engine, reads all above)
          6. api         (AI fetch, reads state/constants/quiz)
          7. progress    (storage, reads state/constants)
+         8. appearance  (appearance settings module)
        ═══════════════════════════════════════ -->
   <script src="js/constants.js"></script>
   <script src="js/state.js"></script>
@@ -371,6 +464,7 @@
   <script src="js/quiz.js"></script>
   <script src="js/api.js"></script>
   <script src="js/progress.js"></script>
+  <script src="js/appearance.js"></script>
 
   <!-- Boot: wire up all UI interactions once DOM is ready -->
   <script>
