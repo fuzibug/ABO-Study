@@ -13,12 +13,18 @@ function escHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-function toast(msg, good) {
+function toast(msg, type) {
   var t = el('toast');
   t.textContent = msg;
-  t.style.borderColor = good === true  ? 'rgba(104,211,145,.35)'
-                      : good === false ? 'rgba(252,129,129,.25)'
-                      : 'var(--bdr)';
+  
+  // Support string types: 'success', 'error', 'warning', 'info'
+  var borderColor;
+  if (type === 'success' || type === true) borderColor = 'rgba(104,211,145,.35)';
+  else if (type === 'error' || type === false) borderColor = 'rgba(252,129,129,.25)';
+  else if (type === 'warning') borderColor = 'rgba(246,173,85,.3)';
+  else borderColor = 'var(--bdr)';
+  
+  t.style.borderColor = borderColor;
   t.classList.add('show');
   clearTimeout(t._t);
   t._t = setTimeout(function () { t.classList.remove('show'); }, 2400);
@@ -109,7 +115,7 @@ function setStatus(sid, msg, cls) {
 window.copyCmd = function (txt) {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(txt)
-      .then(function () { toast('Copied!', true); })
+      .then(function () { toast('Copied!', 'success'); })
       .catch(function () { toast('Copy: ' + txt); });
   } else { toast('Copy: ' + txt); }
 };
@@ -145,10 +151,32 @@ function loadSettings() {
   } catch(e) {}
 }
 
+/* ── Load AI Settings ── */
+function loadAISettings() {
+  // Load temperature setting (default 0.8)
+  var tempSlider = el('rng-ai-temp');
+  var tempValue = el('rv-ai-temp');
+  if (tempSlider && tempValue) {
+    var savedTemp = parseFloat(localStorage.getItem('abo_aiTemp')) || 0.8;
+    tempSlider.value = savedTemp;
+    tempValue.textContent = savedTemp.toFixed(1);
+  }
+  
+  // Load max tokens setting (default 8192)
+  var tokensSlider = el('rng-ai-tokens');
+  var tokensValue = el('rv-ai-tokens');
+  if (tokensSlider && tokensValue) {
+    var savedTokens = parseInt(localStorage.getItem('abo_aiMaxTokens')) || 8192;
+    tokensSlider.value = savedTokens;
+    tokensValue.textContent = savedTokens;
+  }
+}
+
 /* ── Init ── */
 function initUI() {
   buildThemeSwatches();
   loadSettings();
+  loadAISettings();
 
   // Load saved keys
   try {
@@ -163,7 +191,7 @@ function initUI() {
     groqKey = k;
     try { localStorage.setItem('abo_gk', k); } catch(e) {}
     setStatus('status-groq', '&#10003; Saved!', 'ok');
-    toast('Groq key saved', true);
+    toast('Groq key saved', 'success');
   });
   el('key-groq').addEventListener('keydown', function (e) { if (e.key === 'Enter') el('save-groq').click(); });
 
@@ -230,7 +258,7 @@ function initUI() {
     if (d) d.textContent = v === 'practice' ? 'Live score shown' : 'Score hidden until end';
   });
 
-  // Range sliders
+  // Range sliders - Exam Settings
   el('rng-count').addEventListener('input', function () {
     selCount = parseInt(this.value, 10);
     el('rv-count').textContent = this.value;
@@ -241,6 +269,39 @@ function initUI() {
     el('rv-timer').textContent = this.value + 's';
     saveSettings();
   });
+  
+  // AI Settings - Temperature slider
+  var tempSlider = el('rng-ai-temp');
+  var tempValue = el('rv-ai-temp');
+  if (tempSlider && tempValue) {
+    tempSlider.addEventListener('input', function () {
+      var temp = parseFloat(this.value);
+      tempValue.textContent = temp.toFixed(1);
+      localStorage.setItem('abo_aiTemp', temp);
+      
+      // Give contextual feedback
+      var feedback = temp < 0.5 ? 'Very consistent' :
+                     temp < 0.7 ? 'Balanced' :
+                     temp < 0.9 ? 'Creative' : 'Maximum variety';
+      toast('Temperature: ' + temp.toFixed(1) + ' (' + feedback + ')', 'info');
+    });
+  }
+  
+  // AI Settings - Max tokens slider
+  var tokensSlider = el('rng-ai-tokens');
+  var tokensValue = el('rv-ai-tokens');
+  if (tokensSlider && tokensValue) {
+    tokensSlider.addEventListener('input', function () {
+      var tokens = parseInt(this.value, 10);
+      tokensValue.textContent = tokens;
+      localStorage.setItem('abo_aiMaxTokens', tokens);
+      
+      // Give contextual feedback
+      var feedback = tokens < 4096 ? 'Short responses' :
+                     tokens < 8192 ? 'Standard' : 'Extended responses';
+      toast('Max tokens: ' + tokens + ' (' + feedback + ')', 'info');
+    });
+  }
 
   // Toggle settings
   wireTog('chk-timer',  'timer-state',   function (v) { timedMode = v;      saveSettings(); });
@@ -267,12 +328,12 @@ function initUI() {
   el('btn-start').addEventListener('click', function () { startQuiz(null); });
   el('btn-next').addEventListener('click', nextQ);
   el('btn-new').addEventListener('click', gotoSetup);
-el('btn-quit').addEventListener('click', function () {
-  if (questions.length === 0 || confirm('Quit this exam? Progress will be lost.')) {
-    clearTimer();
-    gotoSetup();
-  }
-});
+  el('btn-quit').addEventListener('click', function () {
+    if (questions.length === 0 || confirm('Quit this exam? Progress will be lost.')) {
+      clearTimer();
+      gotoSetup();
+    }
+  });
   el('btn-retry').addEventListener('click', function () {
     var retryList = results
       .filter(function (r) { return !r.ok; })
@@ -283,7 +344,7 @@ el('btn-quit').addEventListener('click', function () {
     if (!confirm('Reset ALL saved progress and session history?\nThis cannot be undone.')) return;
     try { localStorage.removeItem('abo5'); } catch(e) {}
     renderProgress();
-    toast('Progress reset', true);
+    toast('Progress reset', 'success');
   });
 
   // Keyboard shortcuts
