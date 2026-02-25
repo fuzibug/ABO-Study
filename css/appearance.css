@@ -1,0 +1,230 @@
+/* ════════════════════════════════════════════════════════════════
+   ENHANCED APPEARANCE SETTINGS - v2.0
+   ABO-Study Application
+   ════════════════════════════════════════════════════════════════ */
+
+/* Font Size Adjustment (90% to 130%) */
+body.font-90 { font-size: 14.4px; }
+body.font-100 { font-size: 16px; } /* default */
+body.font-110 { font-size: 17.6px; }
+body.font-120 { font-size: 19.2px; }
+body.font-130 { font-size: 20.8px; }
+
+/* Line Height Options */
+body.lineheight-compact .qtext,
+body.lineheight-compact .opt,
+body.lineheight-compact .exp-body,
+body.lineheight-compact .rev-q {
+  line-height: 1.4;
+}
+
+body.lineheight-normal .qtext,
+body.lineheight-normal .opt,
+body.lineheight-normal .exp-body,
+body.lineheight-normal .rev-q {
+  line-height: 1.6;
+}
+
+body.lineheight-relaxed .qtext,
+body.lineheight-relaxed .opt,
+body.lineheight-relaxed .exp-body,
+body.lineheight-relaxed .rev-q {
+  line-height: 1.9;
+}
+
+/* Letter Spacing Options */
+body.letterspacing-normal {
+  letter-spacing: normal;
+}
+
+body.letterspacing-wide {
+  letter-spacing: 0.02em;
+}
+
+body.letterspacing-wide .qtext,
+body.letterspacing-wide .opt,
+body.letterspacing-wide .exp-body {
+  letter-spacing: 0.03em;
+}
+
+/* Animation Control */
+body.animations-none * {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
+
+body.animations-reduced * {
+  animation-duration: 150ms !important;
+  transition-duration: 150ms !important;
+}
+
+body.animations-full {
+  /* Use default animation timings from styles.css */
+}
+
+/* High Contrast Mode */
+body.contrast-high {
+  --bdr: rgba(99,179,237,0.35);
+}
+
+body.contrast-high .card,
+body.contrast-high .opt {
+  border-width: 2px;
+}
+
+body.contrast-high .opt:hover:not([disabled]) {
+  border-width: 2px;
+  box-shadow: 0 0 0 2px var(--acc);
+}
+
+body.contrast-high .opt.ok {
+  border-width: 2px;
+  box-shadow: 0 0 0 2px var(--ok);
+}
+
+body.contrast-high .opt.bad {
+  border-width: 2px;
+  box-shadow: 0 0 0 2px var(--bad);
+}
+
+body.contrast-high .btn-go {
+  border-width: 2px;
+  box-shadow: 0 2px 8px rgba(99,179,237,0.4);
+}
+
+body.contrast-high .dbtn:hover,
+body.contrast-high .dbtn.on {
+  border-width: 2px;
+  box-shadow: 0 0 0 1px var(--acc);
+}
+
+/* Focus Indicators Control */
+body.focus-off *:focus-visible {
+  outline: none !important;
+}
+
+body.focus-on *:focus-visible {
+  outline: 3px solid var(--acc) !important;
+  outline-offset: 3px !important;
+}
+
+/* Enhanced focus for high contrast mode */
+body.contrast-high.focus-on *:focus-visible {
+  outline: 4px solid var(--acc) !important;
+  outline-offset: 4px !important;
+}
+
+/* Theme-Specific High Contrast Adjustments */
+body.theme-clinical.contrast-high {
+  --bdr: rgba(49,130,206,0.4);
+  --tx: #000000;
+  --tx2: #2d3748;
+}
+
+body.theme-emerald.contrast-high {
+  --bdr: rgba(72,187,120,0.35);
+}
+
+body.theme-crimson.contrast-high {
+  --bdr: rgba(245,101,101,0.35);
+}
+
+body.theme-violet.contrast-high {
+  --bdr: rgba(159,122,234,0.35);
+}
+
+body.theme-slate.contrast-high {
+  --bdr: rgba(160,174,192,0.3);
+}
+
+/* Ensure dyslexic font works with all size/spacing options */
+body.dyslexic.font-90,
+body.dyslexic.font-100,
+body.dyslexic.font-110,
+body.dyslexic.font-120,
+body.dyslexic.font-130 {
+  font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+/* Combined settings optimization */
+body.lineheight-relaxed.letterspacing-wide .qtext {
+  line-height: 2.0;
+  letter-spacing: 0.04em;
+}
+
+/* Mobile Optimizations */
+@media(max-width:600px) {
+  /* Prevent text overflow on small screens with large font */
+  body.font-120,
+  body.font-130 {
+    font-size: 16px;
+  }
+  
+  /* Slightly less relaxed line height on mobile to save space */
+  body.lineheight-relaxed .qtext {
+    line-height: 1.75;
+  }
+}
+
+/* Smooth Transitions for Setting Changes */
+body {
+  transition: background .3s, color .3s, font-size 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.qtext, .opt, .exp-body, .rev-q {
+  transition: line-height 0.3s ease, letter-spacing 0.3s ease;
+}
+
+/* Respect Operating System Accessibility Preferences */
+@media (prefers-contrast: high) {
+  /* Auto-enhance contrast for users with OS-level preference */
+  body:not(.contrast-high) {
+    --bdr: rgba(99,179,237,0.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Respect OS-level reduced motion preference */
+  body.animations-full * {
+    animation-duration: 0.1s !important;
+    transition-duration: 0.1s !important;
+  }
+}
+
+/* Print Styles (for study materials) */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+  }
+  
+  body.font-90,
+  body.font-100,
+  body.font-110,
+  body.font-120,
+  body.font-130 {
+    font-size: 12pt !important;
+  }
+  
+  .qtext, .opt {
+    line-height: 1.6 !important;
+  }
+}
+
+/* Accessibility: Color-blind friendly indicators */
+body.contrast-high .opt.ok::before {
+  content: "✔️ ";
+  margin-right: 4px;
+}
+
+body.contrast-high .opt.bad::before {
+  content: "❌ ";
+  margin-right: 4px;
+}
+
+/* Performance: Disable GPU acceleration for animations-none */
+body.animations-none * {
+  transform: none !important;
+  will-change: auto !important;
+}
