@@ -104,6 +104,12 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .btn-sec:hover{border-color:var(--acc);color:var(--acc);}
 .btn-danger{border-color:rgba(252,129,129,.2)!important;color:rgba(252,129,129,.6)!important;}
 .btn-danger:hover{border-color:rgba(252,129,129,.5)!important;color:var(--bad)!important;}
+
+/* ── Tool Button Styling ── */
+.tool-btn{background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:24px 20px;cursor:pointer;transition:.2s;text-align:center;width:100%;font-family:"DM Sans",sans-serif;color:var(--tx);}
+.tool-btn:hover{border-color:var(--acc);background:rgba(99,179,237,.08);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.tool-btn:active{transform:translateY(-1px);}
+
 .prog{height:3px;background:var(--s2);border-radius:2px;margin-bottom:24px;overflow:hidden;}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--gold));border-radius:2px;transition:width .35s;}
 .timer-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
