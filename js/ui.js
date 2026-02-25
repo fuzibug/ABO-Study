@@ -45,6 +45,7 @@ function showPage(pid) {
 
 function gotoSetup() { showPage('pg-setup'); }
 function gotoProg()  { showPage('pg-prog'); renderProgress(); }
+function gotoTools() { showPage('pg-tools'); }
 function gotoAppear(){ showPage('pg-appear'); }
 
 function isFileProtocol() { return location.protocol === 'file:'; }
@@ -320,9 +321,10 @@ function initUI() {
   }
 
   // Tab navigation
-  ['t-setup','t-setup2','t-setup3'].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoSetup); });
-  ['t-prog', 't-prog2', 't-prog3' ].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoProg);  });
-  ['t-appear','t-appear2','t-appear3'].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoAppear); });
+  ['t-setup','t-setup2','t-setup3','t-setup4'].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoSetup); });
+  ['t-prog', 't-prog2', 't-prog3', 't-prog4' ].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoProg);  });
+  ['t-tools','t-tools2','t-tools3','t-tools4'].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoTools); });
+  ['t-appear','t-appear2','t-appear3','t-appear4'].forEach(function (id) { var e = el(id); if (e) e.addEventListener('click', gotoAppear); });
 
   // Main action buttons
   el('btn-start').addEventListener('click', function () { startQuiz(null); });

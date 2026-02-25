@@ -52,12 +52,12 @@ var THEMES = [
 
 // Pages → which tab IDs should be "on" for that page
 var TAB_MAP = {
-  'pg-setup':     ['t-setup',  't-setup2',  't-setup3'],
-  'pg-prog':      ['t-prog',   't-prog2',   't-prog3'],
-  'pg-appear':    ['t-appear', 't-appear2', 't-appear3'],
-  'pg-reference': ['t-ref',    't-ref2',    't-ref3'],
-  'pg-chat':      ['t-chat',   't-chat2',   't-chat3'],
-  'pg-tools':     ['t-tools',  't-tools2',  't-tools3'],
+  'pg-setup':     ['t-setup',  't-setup2',  't-setup3',  't-setup4'],
+  'pg-prog':      ['t-prog',   't-prog2',   't-prog3',   't-prog4'],
+  'pg-tools':     ['t-tools',  't-tools2',  't-tools3',  't-tools4'],
+  'pg-appear':    ['t-appear', 't-appear2', 't-appear3', 't-appear4'],
+  'pg-reference': ['t-ref',    't-ref2',    't-ref3',    't-ref4'],
+  'pg-chat':      ['t-chat',   't-chat2',   't-chat3',   't-chat4'],
 };
 
-var ALL_PAGES = ['pg-setup', 'pg-prog', 'pg-appear', 'pg-reference', 'pg-chat', 'pg-tools', 'pg-quiz', 'pg-results'];
+var ALL_PAGES = ['pg-setup', 'pg-prog', 'pg-tools', 'pg-appear', 'pg-reference', 'pg-chat', 'pg-quiz', 'pg-results'];
