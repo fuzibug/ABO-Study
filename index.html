@@ -9,6 +9,7 @@
   <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/appearance.css">
+  <link rel="stylesheet" href="css/formulas.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a>
@@ -446,7 +447,11 @@
   </div>
   <div class="prog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Quiz progress"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
   <div id="qcard" class="card"></div>
-  <div class="qfoot"><button class="btn-sec btn-quit" id="btn-quit" title="Quit exam" style="padding:8px 14px;font-size:12px;">✕ Quit</button>
+  <div class="qfoot">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn-sec btn-quit" id="btn-quit" title="Quit exam" style="padding:8px 14px;font-size:12px;">✕ Quit</button>
+      <button class="btn-sec" id="btn-formula" title="Formula Reference (Practice mode only)" style="padding:8px 14px;font-size:12px;display:none;">📐 Formulas</button>
+    </div>
     <div class="live" id="live-wrap" aria-live="polite" aria-atomic="true">&#10003;&#160;<span class="live-c" id="live-c">0</span>&#160;&#160;&#10007;&#160;<span class="live-w" id="live-w">0</span>&#160;&#160;<span id="live-p" style="color:var(--tx2)">0/0</span></div>
     <div class="next-row" id="next-row" style="display:none">
       <span class="kbd">Space</span>&#160;/&#160;<span class="kbd">&#8594;</span>
@@ -491,6 +496,7 @@
          6. api         (AI fetch, reads state/constants/quiz)
          7. progress    (storage, reads state/constants)
          8. appearance  (appearance settings module)
+         9. formulas    (formula reference module)
        ═══════════════════════════════════════ -->
   <script src="js/constants.js"></script>
   <script src="js/state.js"></script>
@@ -500,11 +506,24 @@
   <script src="js/api.js"></script>
   <script src="js/progress.js"></script>
   <script src="js/appearance.js"></script>
+  <script src="js/formulas.js"></script>
 
   <!-- Boot: wire up all UI interactions once DOM is ready -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       initUI();
+      
+      // Wire formula button
+      var btnFormula = document.getElementById('btn-formula');
+      if (btnFormula) {
+        btnFormula.addEventListener('click', openFormulaModal);
+      }
+      
+      // Show/hide formula button based on exam mode
+      // (Hidden in exam mode, shown in practice mode)
+      if (examMode === 'practice') {
+        if (btnFormula) btnFormula.style.display = 'block';
+      }
     });
   </script>
 
