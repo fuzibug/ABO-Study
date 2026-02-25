@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ABO Mock Exam</title>
+  <meta name="description" content="Professional ABO/NCLE certification exam preparation with AI, spaced repetition, and interactive tools">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3b82f6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
@@ -26,6 +29,7 @@
   <div class="tabs" role="tablist" aria-label="Navigation">
     <button class="tab on" id="t-setup"  role="tab" aria-selected="true"  aria-controls="pg-setup">&#128203; New Exam</button>
     <button class="tab"    id="t-prog"   role="tab" aria-selected="false" aria-controls="pg-prog">&#128200; Progress</button>
+    <button class="tab"    id="t-tools"  role="tab" aria-selected="false" aria-controls="pg-tools">&#128295; Study Tools</button>
     <button class="tab"    id="t-appear" role="tab" aria-selected="false" aria-controls="pg-appear">&#127914; Appearance</button>
   </div>
 
@@ -52,7 +56,6 @@
           <div class="prov-desc">Dedicated LPU hardware delivers responses in &lt;2 sec. Best for rapid-fire practice. Generous free tier — no credit card required.</div>
         </div>
      </div>
-      <!-- file:// CORS warning — shown by JS if needed -->
       <div class="file-warn" id="file-warn">
         <div class="file-warn-icon">&#9888;&#65039;</div>
         <div class="file-warn-body">
@@ -88,14 +91,6 @@
               <div class="mc-why">Alibaba's Qwen3 32B — excellent JSON schema compliance and strong reasoning. Best alternative when Llama models are rate-limited.</div>
             </div>
           </div>
-          <div class="mc" data-mid="llama-3.1-8b-instant">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">Llama 3.1 8B Instant</div>
-              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Ultra-Fast</span></div>
-              <div class="mc-why">Meta's fastest model on Groq — sub-second responses. Best for rapid-fire practice sessions. Lighter on expert-level nuance.</div>
-            </div>
-          </div>
         </div>
         <div class="api-hint">Get a free Groq key (no card) at <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></div>
         <div class="api-row" style="margin-top:8px">
@@ -105,67 +100,6 @@
         <div class="api-status" id="status-groq"></div>
       </div>
 
-      <div class="model-section" id="ms-or">
-        <div class="models-ctitle">Select OpenRouter Model</div>
-        <div class="model-list" id="ml-or">
-          <div class="mc on" data-mid="meta-llama/llama-3.3-70b-instruct:free">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">Llama 3.3 70B Instruct <span style="color:var(--ok);font-size:10px">(Free)</span></div>
-              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-smart">Best Free</span></div>
-              <div class="mc-why">Same Llama 3.3 70B via OpenRouter's routing. Best free option — use when Groq is rate-limited. Excellent ABO domain accuracy.</div>
-            </div>
-          </div>
-          <div class="mc" data-mid="deepseek/deepseek-r1-0528:free">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">DeepSeek R1 <span style="color:var(--ok);font-size:10px">(Free)</span></div>
-              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-reason">Best for Calc</span></div>
-              <div class="mc-why">Chain-of-thought reasoning model — works step-by-step before answering. Excellent for Prentice's Rule, vergence, and transposition math. Slower but very accurate on calculations.</div>
-            </div>
-          </div>
-          <div class="mc" data-mid="google/gemma-3-27b-it:free">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">Gemma 3 27B <span style="color:var(--ok);font-size:10px">(Free)</span></div>
-              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Reliable</span></div>
-              <div class="mc-why">Google's latest free model. Strong instruction following and clean JSON output. Good at anatomy and pathology content.</div>
-            </div>
-          </div>
-          <div class="mc" data-mid="mistralai/mistral-7b-instruct:free">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">Mistral 7B Instruct <span style="color:var(--ok);font-size:10px">(Free)</span></div>
-              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fastest Free</span></div>
-              <div class="mc-why">Lean 7B — fastest free option on OpenRouter. Capable for foundation/intermediate questions. Limited on expert-level nuance.</div>
-            </div>
-          </div>
-          <div class="mc" data-mid="anthropic/claude-3.5-sonnet">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">Claude 3.5 Sonnet <span style="color:var(--wrn);font-size:10px">(Paid)</span></div>
-              <div class="mc-badges"><span class="mbadge mb-smart">Most Accurate</span><span class="mbadge mb-paid">~$0.003/q</span></div>
-              <div class="mc-why">Highest ABO content accuracy and nuanced explanations of any model tested. Best for expert/advanced difficulty. Requires OpenRouter credits.</div>
-            </div>
-          </div>
-          <div class="mc" data-mid="openai/gpt-4o-mini">
-            <div class="mc-dot"></div>
-            <div class="mc-info">
-              <div class="mc-name">GPT-4o Mini <span style="color:var(--wrn);font-size:10px">(Paid)</span></div>
-              <div class="mc-badges"><span class="mbadge mb-smart">Reliable</span><span class="mbadge mb-paid">~$0.0002/q</span></div>
-              <div class="mc-why">OpenAI's budget flagship — GPT-4 class reasoning at very low cost. Consistent JSON output, strong at math-heavy and regulation questions.</div>
-            </div>
-          </div>
-        </div>
-        <div class="api-hint">Get an OpenRouter key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> — many models are free with no credits needed.</div>
-        <div class="api-row" style="margin-top:8px">
-          <input class="api-input" type="password" id="key-or" placeholder="OpenRouter API key…" autocomplete="off">
-          <button class="api-save" id="save-or">Save</button>
-        </div>
-        <div class="api-status" id="status-or"></div>
-      </div>
-      
-      <!-- AI SETTINGS SECTION -->
       <div class="card" style="margin-top:16px;background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.15)">
         <div class="ctitle">⚙️ AI Generation Settings</div>
         <p style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Fine-tune how the AI generates questions. Changes apply to next generation.</p>
@@ -188,15 +122,6 @@
             </div>
             <span class="sbox-desc">Higher = longer responses (prevents cut-off), but slower & more expensive</span>
           </div>
-        </div>
-        
-        <div style="margin-top:12px;padding:10px;background:rgba(99,179,237,.05);border:1px solid rgba(99,179,237,.15);border-radius:6px;font-size:11px;color:var(--tx2);line-height:1.6">
-          <strong style="color:var(--acc)">💡 Tips:</strong><br>
-          • <strong>Temperature 0.8</strong> (default) balances accuracy with variety<br>
-          • Increase to <strong>1.0-1.2</strong> if questions feel repetitive<br>
-          • Decrease to <strong>0.3-0.5</strong> for maximum factual consistency<br>
-          • <strong>8192 tokens</strong> is ideal for 10-20 questions<br>
-          • Increase tokens if seeing truncated/incomplete questions
         </div>
       </div>
     </div>
@@ -314,12 +239,66 @@
   <div class="tabs" role="tablist" aria-label="Navigation">
     <button class="tab" id="t-setup2">&#128203; New Exam</button>
     <button class="tab on" id="t-prog2">&#128200; Progress</button>
+    <button class="tab" id="t-tools2">&#128295; Study Tools</button>
     <button class="tab" id="t-appear2">&#127914; Appearance</button>
   </div>
-  <div class="card"><div class="ctitle">&#128200; Overall Statistics</div><div class="stat-grid" id="stat-grid"></div></div>
+  <div class="card">
+    <div class="ctitle">&#128200; Overall Statistics</div>
+    <div class="stat-grid" id="stat-grid"></div>
+  </div>
+  <div class="card" id="streak-card" style="display:none;">
+    <div class="ctitle">&#128293; Study Streaks</div>
+    <div class="stat-grid" id="streak-grid"></div>
+  </div>
+  <div class="card" id="srs-card" style="display:none;">
+    <div class="ctitle">&#129504; Spaced Repetition</div>
+    <div class="stat-grid" id="srs-grid"></div>
+  </div>
   <div class="card"><div class="ctitle">&#127919; Domain Performance</div><div class="dom-list" id="prog-doms"></div></div>
   <div class="card"><div class="ctitle">&#128336; Recent Sessions</div><div class="ses-list" id="ses-list"></div></div>
-  <div style="margin-top:12px;text-align:right"><button class="btn-sec btn-danger" id="btn-clear">&#128465; Reset All Progress</button></div>
+  <div style="margin-top:12px;text-align:right">
+    <button class="btn-sec" id="btn-export-report" style="margin-right:8px">&#128202; Export Report</button>
+    <button class="btn-sec btn-danger" id="btn-clear">&#128465; Reset All Progress</button>
+  </div>
+</div>
+
+<!-- STUDY TOOLS -->
+<div id="pg-tools" class="page">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab" id="t-setup4">&#128203; New Exam</button>
+    <button class="tab" id="t-prog4">&#128200; Progress</button>
+    <button class="tab on" id="t-tools4">&#128295; Study Tools</button>
+    <button class="tab" id="t-appear4">&#127914; Appearance</button>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">&#128295; Interactive Study Tools</div>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:16px;">Practice with visual simulators, calculators, and flashcards</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;">
+      <button class="tool-btn" onclick="showCalculator()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128208;</div>
+        <div style="font-weight:600;margin-bottom:4px;">Formula Calculator</div>
+        <div style="font-size:12px;opacity:0.8;">Prentice, vergence, transposition, ANSI</div>
+      </button>
+      <button class="tool-btn" onclick="showSimulator()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128300;</div>
+        <div style="font-weight:600;margin-bottom:4px;">Lens Simulator</div>
+        <div style="font-size:12px;opacity:0.8;">Ray tracing visualization</div>
+      </button>
+      <button class="tool-btn" onclick="showFlashcards()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128257;</div>
+        <div style="font-weight:600;margin-bottom:4px;">Flashcard Mode</div>
+        <div style="font-size:12px;opacity:0.8;">Quick review format</div>
+      </button>
+      <button class="tool-btn" onclick="showSRSReview()">
+        <div style="font-size:32px;margin-bottom:8px;">&#129504;</div>
+        <div style="font-weight:600;margin-bottom:4px;">SRS Review</div>
+        <div style="font-size:12px;opacity:0.8;">Questions due today</div>
+      </button>
+    </div>
+  </div>
+  
+  <div id="tool-container" style="display:none;"></div>
 </div>
 
 <!-- APPEARANCE -->
@@ -327,6 +306,7 @@
   <div class="tabs" role="tablist" aria-label="Navigation">
     <button class="tab" id="t-setup3">&#128203; New Exam</button>
     <button class="tab" id="t-prog3">&#128200; Progress</button>
+    <button class="tab" id="t-tools3">&#128295; Study Tools</button>
     <button class="tab on" id="t-appear3">&#127914; Appearance</button>
   </div>
   
@@ -408,33 +388,6 @@
         </div>
         <span class="sbox-desc">Keyboard navigation aids</span>
       </div>
-      
-      <div class="sbox">
-        <span class="slabel">Sound Effects</span>
-        <div class="tog-row">
-          <span class="tog-state" id="sound-state">Off</span>
-          <label class="tog"><input type="checkbox" id="chk-sound"><span class="tog-track"></span></label>
-        </div>
-        <span class="sbox-desc">Audio feedback (future)</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="card">
-    <div class="ctitle">&#128065; Theme Preview</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px">
-      <div class="res-box"><div class="res-num" style="color:var(--acc)">Aa</div><div class="res-lbl">Accent</div></div>
-      <div class="res-box"><div class="res-num" style="color:var(--ok)">&#10003;</div><div class="res-lbl">Correct</div></div>
-      <div class="res-box"><div class="res-num" style="color:var(--bad)">&#10007;</div><div class="res-lbl">Wrong</div></div>
-    </div>
-    <div class="opt" style="pointer-events:none;margin-bottom:7px"><span class="opt-l">A</span><span>Sample answer option</span></div>
-    <div class="opt ok" style="pointer-events:none;margin-bottom:7px"><span class="opt-l">B</span><span>Correct answer highlight</span></div>
-    <div class="opt bad" style="pointer-events:none"><span class="opt-l">C</span><span>Incorrect answer highlight</span></div>
-  </div>
-  
-  <div class="card" style="background:rgba(99,179,237,.04);border-color:rgba(99,179,237,.2)">
-    <div style="font-size:12px;color:var(--tx2);line-height:1.7;">
-      <strong style="color:var(--acc)">&#128161; Tip:</strong> All appearance settings are saved automatically and persist across sessions. Changes take effect immediately.
     </div>
   </div>
 </div>
@@ -483,21 +436,10 @@
   </div>
 </div>
 
-</main><!-- /wrap -->
+</main>
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- ═══════════════════════════════════════
-       JS — load order matters:
-         1. constants   (lookup tables, no deps)
-         2. state       (shared vars, no deps)
-         3. data        (BANK array, no deps)
-         4. ui          (DOM helpers, reads state/constants)
-         5. quiz        (quiz engine, reads all above)
-         6. api         (AI fetch, reads state/constants/quiz)
-         7. progress    (storage, reads state/constants)
-         8. appearance  (appearance settings module)
-         9. formulas    (formula reference module)
-       ═══════════════════════════════════════ -->
+  <!-- Core scripts -->
   <script src="js/constants.js"></script>
   <script src="js/state.js"></script>
   <script src="js/data.js"></script>
@@ -507,8 +449,31 @@
   <script src="js/progress.js"></script>
   <script src="js/appearance.js"></script>
   <script src="js/formulas.js"></script>
+  
+  <!-- New feature scripts -->
+  <script src="js/srs.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/simulator.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script src="js/export.js"></script>
 
-  <!-- Boot: wire up all UI interactions once DOM is ready -->
+  <!-- PWA registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registered:', registration.scope);
+          })
+          .catch(function(err) {
+            console.log('ServiceWorker registration failed:', err);
+          });
+      });
+    }
+  </script>
+
+  <!-- Boot -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       initUI();
@@ -520,11 +485,72 @@
       }
       
       // Show/hide formula button based on exam mode
-      // (Hidden in exam mode, shown in practice mode)
       if (examMode === 'practice') {
         if (btnFormula) btnFormula.style.display = 'block';
       }
+      
+      // Wire export report button
+      var btnExport = document.getElementById('btn-export-report');
+      if (btnExport && typeof Export !== 'undefined') {
+        btnExport.addEventListener('click', function() {
+          Export.viewReport();
+        });
+      }
+      
+      // Update progress display with new features
+      if (typeof Analytics !== 'undefined') {
+        var streakInfo = Analytics.getStreakInfo();
+        if (streakInfo.currentStreak > 0) {
+          document.getElementById('streak-card').style.display = 'block';
+          document.getElementById('streak-grid').innerHTML = 
+            '<div class="stat"><div class="stat-val">🔥 ' + streakInfo.currentStreak + '</div><div class="stat-lbl">Current Streak</div></div>' +
+            '<div class="stat"><div class="stat-val">🏆 ' + streakInfo.longestStreak + '</div><div class="stat-lbl">Longest Streak</div></div>';
+        }
+      }
+      
+      if (typeof SRS !== 'undefined') {
+        var srsStats = SRS.getStatistics();
+        if (srsStats.totalCards > 0) {
+          document.getElementById('srs-card').style.display = 'block';
+          document.getElementById('srs-grid').innerHTML = 
+            '<div class="stat"><div class="stat-val">' + srsStats.dueToday + '</div><div class="stat-lbl">Due Today</div></div>' +
+            '<div class="stat"><div class="stat-val">' + srsStats.mastered + '</div><div class="stat-lbl">Mastered</div></div>' +
+            '<div class="stat"><div class="stat-val">' + srsStats.totalCards + '</div><div class="stat-lbl">Total Cards</div></div>';
+        }
+      }
     });
+    
+    // Tool functions
+    function showCalculator() {
+      if (typeof Calculator !== 'undefined') {
+        document.getElementById('tool-container').style.display = 'block';
+        Calculator.generateUI('tool-container');
+      }
+    }
+    
+    function showSimulator() {
+      if (typeof Simulator !== 'undefined') {
+        document.getElementById('tool-container').style.display = 'block';
+        Simulator.generateUI('tool-container');
+      }
+    }
+    
+    function showFlashcards() {
+      if (typeof Flashcards !== 'undefined' && typeof BANK !== 'undefined') {
+        document.getElementById('tool-container').style.display = 'block';
+        Flashcards.init(BANK.slice(0, 20));
+        Flashcards.generateUI('tool-container');
+        Flashcards.updateDisplay();
+      }
+    }
+    
+    function showSRSReview() {
+      if (typeof SRS !== 'undefined' && typeof BANK !== 'undefined') {
+        var dueQuestions = SRS.getDueQuestions(BANK);
+        alert('You have ' + dueQuestions.length + ' questions due for review today!');
+        // TODO: Start quiz with due questions
+      }
+    }
   </script>
 
 </body>
