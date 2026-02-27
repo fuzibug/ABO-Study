@@ -168,30 +168,76 @@ function buildUserPrompt() {
     calculations: 'ONLY calculation-intensive questions — MUST include Prentice\'s Rule, vergence, transposition, spherical equivalent, magnification, blank size, effectivity, or prism resolution. Show your calculation work.',
   };
   
-  // Rotation through different emphasis areas
+  // Generate unique session seed for variety
+  var sessionSeed = Date.now() % 1000;
+  
+  // Expanded rotation through different emphasis areas (12 options instead of 6)
   var emphasisOptions = [
-    'Emphasize real-world clinical troubleshooting scenarios with patient complaints.',
-    'Focus on precise numerical calculations with uncommon but valid parameter combinations.',
-    'Include regulation/standard questions with specific ANSI or FDA citations.',
-    'Test conceptual understanding with "why" questions, not just "what" questions.',
-    'Use patient case studies requiring integration of multiple knowledge domains.',
-    'Challenge with edge cases and exception scenarios that catch advanced students.',
+    'Emphasize real-world clinical troubleshooting with specific patient complaints and symptoms.',
+    'Focus on precise numerical calculations using uncommon parameter combinations and irregular values.',
+    'Include regulation/standard questions citing specific ANSI Z80.1-2022 or FDA 21 CFR sections.',
+    'Test deep conceptual understanding with "why" and "how" questions requiring explanation.',
+    'Use detailed patient case studies requiring integration of 2-3 knowledge domains.',
+    'Challenge with edge cases, exceptions, and scenarios that catch advanced students.',
+    'Frame questions as dispensing dilemmas requiring practical judgment calls.',
+    'Use comparative questions: "Which is better for..." or "What distinguishes X from Y..."',
+    'Test troubleshooting skills: "A patient complains of... what is the most likely cause?"',
+    'Focus on measurement verification and lensometry interpretation scenarios.',
+    'Include frame selection for specific face shapes, lifestyles, or occupations.',
+    'Test material property trade-offs in real prescription scenarios.',
   ];
   var randomEmphasis = emphasisOptions[Math.floor(Math.random() * emphasisOptions.length)];
   
+  // Add question format variety (new)
+  var formatOptions = [
+    'Use primarily scenario-based questions with patient details (age, occupation, symptoms).',
+    'Mix direct factual questions with applied clinical decision-making.',
+    'Include "best option" questions where 2-3 answers are partially correct.',
+    'Use troubleshooting format: "Given this problem, what would you check first?"',
+    'Frame questions as conversations: "A patient asks... how would you explain..."',
+    'Include calculation questions with realistic prescription parameters.',
+  ];
+  var randomFormat = formatOptions[Math.floor(Math.random() * formatOptions.length)];
+  
   // Get AI temperature setting (default 0.8)
   var temp = parseFloat(localStorage.getItem('abo_aiTemp')) || 0.8;
-  var varietyNote = temp > 0.9 ? 'Use maximum creativity in question phrasing and scenarios.' :
-                    temp < 0.5 ? 'Focus on precise, factual questions with minimal variation.' :
-                    'Balance creativity with clinical accuracy.';
+  
+  // Enhanced temperature-based variety instructions (5 tiers instead of 3)
+  var varietyNote = temp > 1.0 ? 'MAXIMIZE creativity: use unusual scenarios, rare combinations, and unexpected question angles.' :
+                    temp > 0.85 ? 'Use high creativity in phrasing, scenarios, and parameter selection. Avoid predictable patterns.' :
+                    temp > 0.7 ? 'Balance clinical accuracy with creative variety in question structure and values.' :
+                    temp < 0.5 ? 'Focus on precise, textbook-style questions with standard parameters.' :
+                    'Use moderate variation while maintaining exam realism.';
+  
+  // Numerical diversity guidance
+  var numericGuidance = [
+    'Sphere powers: Use values like +1.25, -3.75, +5.50, -7.25, +0.50',
+    'Cylinder powers: Vary between -0.50, -1.25, -2.75, -3.50, not just -0.75/-1.50',
+    'Axes: Strongly prefer oblique axes: 15°, 35°, 55°, 125°, 165° over 90°/180°',
+    'Prism: Use diverse directions and magnitudes: 2.5Δ BU, 4Δ BO, 1.25Δ BD',
+    'Measurements: PD from 54-68mm, seg heights 18-24mm, decentration 3-12mm',
+  ].join('\n• ');
   
   return [
     'Generate exactly ' + selCount + ' unique ABO certification exam questions.',
     'Domain focus: ' + (domMap[selDomain] || domMap.all) + '.',
     'Difficulty level: ' + (diffMap[selDiff] || diffMap.mixed) + '.',
     '',
+    'Session variation seed: ' + sessionSeed + ' (use this to vary your question generation approach)',
     'Special emphasis for this batch: ' + randomEmphasis,
+    'Question format style: ' + randomFormat,
     varietyNote,
+    '',
+    'NUMERICAL DIVERSITY GUIDANCE:',
+    '• ' + numericGuidance,
+    '',
+    'AVOID THESE PATTERNS (they make questions feel scripted):',
+    '• DO NOT use sphere powers like ±2.00, ±4.00, ±6.00 repeatedly',
+    '• DO NOT default to 90° or 180° axis — use oblique axes 70% of the time',
+    '• DO NOT make every bifocal an FT-28 — include FT-35, D-segment, Ultex',
+    '• DO NOT always use standard PD (63mm) — vary between 54-68mm realistically',
+    '• DO NOT phrase all questions the same way (What is, Which of the following, etc.)',
+    '• DO NOT make the correct answer always option B or C — truly randomize',
     '',
     'CRITICAL REQUIREMENTS:',
     '• Each question must be DISTINCT — no overlapping topics',
