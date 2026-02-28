@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────
 //  api.js  —  AI question generation
 //  Enhanced with better prompting & user controls
+//  + 5-layer safety net for question validation
 // ─────────────────────────────────────────
 
 /* ── Environment detection ── */
@@ -34,6 +35,29 @@ function buildSystemPrompt() {
     'You are an elite ABO (American Board of Opticianry) exam question writer with 20+ years of clinical opticianry experience.',
     'Your questions are used to prepare candidates for the actual ABO certification exam.',
     'Generate RIGOROUSLY ACCURATE, clinically realistic multiple-choice questions that mirror real ABO exam difficulty and style.',
+    '',
+    '═══════════════════════════════════════════════════════════════',
+    '🚨 CRITICAL SELF-CONSISTENCY REQUIREMENTS 🚨',
+    '═══════════════════════════════════════════════════════════════',
+    '',
+    '⚠️ NEVER GENERATE A QUESTION WHERE:',
+    '• The calculated/correct answer is NOT among the 4 provided options',
+    '• The explanation shows a different answer than the marked correct option',
+    '• The explanation admits "not among the options" then picks an arbitrary answer',
+    '• The formula used in explanation contradicts established ABO formulas',
+    '• Options contain mathematically impossible values (negative PD, axis >180°, etc.)',
+    '',
+    '✅ MANDATORY GENERATION WORKFLOW:',
+    '1. Decide what concept/formula to test',
+    '2. Create a realistic scenario with specific numerical parameters',
+    '3. CALCULATE THE CORRECT ANSWER using the proper formula',
+    '4. Create 4 options where one EXACTLY MATCHES your calculated answer',
+    '5. Generate 3 plausible distractors (common errors, close values)',
+    '6. Write explanation that shows calculation step-by-step',
+    '7. VERIFY the explanation\'s final answer matches the correct option index',
+    '',
+    '❌ If you cannot create valid distractors that differ from the correct answer,',
+    '   choose a DIFFERENT scenario with parameters that allow distinct options.',
     '',
     '═══════════════════════════════════════════════════════════════',
     'CRITICAL ACCURACY REQUIREMENTS (NON-NEGOTIABLE)',
@@ -113,7 +137,7 @@ function buildSystemPrompt() {
     '',
     'REGULATORY STANDARDS:',
     '• FDA drop ball test: 5/8-inch steel ball from 50 inches (21 CFR 801.410)',
-    '• ANSI Z87.1: safety eyewear (industrial/occupational)',
+    '• ANSI Z87.1: safety eyear (industrial/occupational)',
     '• ANSI Z80.1-2022: prescription ophthalmic lenses (tolerances, testing)',
     '• FTC Eyeglass Rule (16 CFR 315): must provide Rx to patient without extra charge',
     '• OSHA 29 CFR 1910.133: employer must ensure proper PPE',
@@ -182,6 +206,7 @@ function buildSystemPrompt() {
     '• Show calculation steps for math problems',
     '• Explain why other options are incorrect',
     '• Reference ABO Study Guide sections when applicable',
+    '• CRITICAL: Final calculated value in explanation MUST match the correct option exactly',
     '',
     'OUTPUT FORMAT (CRITICAL):',
     'Return ONLY raw JSON — absolutely NO markdown fences, NO ```json blocks, NO commentary.',
@@ -345,12 +370,13 @@ function buildUserPrompt() {
     '• Explanations must show formulas, cite standards, and explain why wrong answers are wrong',
     '• For multi-step scenarios, include enough detail for complete clinical reasoning',
     '• When using specialty domains, demonstrate deep knowledge of that specific area',
+    '• NEVER generate a question where the calculated answer is not among the 4 options',
     '',
     'Return ONLY raw JSON with NO markdown, NO code fences, NO commentary.',
   ].join('\n');
 }
 
-/* ── Response parser ── */
+/* ── Response parser with SAFETY NET ── */
 
 function parseAIResponse(raw) {
   // Strip DeepSeek R1 chain-of-thought blocks
@@ -387,26 +413,161 @@ function parseAIResponse(raw) {
     throw new Error('Response contained zero questions. Try increasing max_tokens setting.');
   }
 
-  // Validate each question structure
+  // ═══ SAFETY NET: Validate and filter questions ═══
+  var validQuestions = [];
+  var rejectedCount = 0;
+  
   parsed.questions.forEach(function (q, i) {
     var num = i + 1;
-    if (!q.question || typeof q.question !== 'string')
-      throw new Error('Question ' + num + ' missing or invalid "question" field');
-    if (!q.domain || typeof q.domain !== 'string')
-      throw new Error('Question ' + num + ' missing "domain" field');
-    if (!Array.isArray(q.options) || q.options.length !== 4)
-      throw new Error('Question ' + num + ' must have exactly 4 options (has ' + (q.options ? q.options.length : 0) + ')');
-    if (typeof q.correct !== 'number' || q.correct < 0 || q.correct > 3)
-      throw new Error('Question ' + num + ' has invalid "correct" index: ' + q.correct);
-    if (!q.explanation || typeof q.explanation !== 'string')
-      throw new Error('Question ' + num + ' missing "explanation" field');
-      
+    var issues = [];
+    
+    // Basic structure validation
+    if (!q.question || typeof q.question !== 'string') {
+      issues.push('missing question text');
+    }
+    if (!q.domain || typeof q.domain !== 'string') {
+      issues.push('missing domain');
+    }
+    if (!Array.isArray(q.options) || q.options.length !== 4) {
+      issues.push('must have exactly 4 options');
+    }
+    if (typeof q.correct !== 'number' || q.correct < 0 || q.correct > 3) {
+      issues.push('invalid correct answer index: ' + q.correct);
+    }
+    if (!q.explanation || typeof q.explanation !== 'string') {
+      issues.push('missing explanation');
+    }
+    
     // Optional: normalize difficulty if missing
     if (!q.difficulty) q.difficulty = 'intermediate';
+    
+    // ═══ LAYER 2-3: Self-Consistency Checks ═══
+    if (issues.length === 0 && q.explanation) {
+      var exp = q.explanation.toLowerCase();
+      
+      // Check for red-flag phrases indicating broken questions
+      var redFlags = [
+        'not among the options',
+        'is not listed',
+        'none of the options',
+        'however, this is not',
+        'more realistic approach',
+        'more suitable',
+        'would be more',
+      ];
+      
+      for (var j = 0; j < redFlags.length; j++) {
+        if (exp.indexOf(redFlags[j]) !== -1) {
+          issues.push('explanation admits answer not in options ("' + redFlags[j] + '")');
+          break;
+        }
+      }
+      
+      // Check for calculation questions where answer might not match
+      var calcKeywords = [
+        'minimum pd',
+        'prism magnitude',
+        'blank size',
+        'fitting height',
+        'decentration',
+        'spherical equivalent',
+        'transposition',
+        'resultant',
+      ];
+      
+      var isCalcQuestion = false;
+      for (var k = 0; k < calcKeywords.length; k++) {
+        if (q.question.toLowerCase().indexOf(calcKeywords[k]) !== -1) {
+          isCalcQuestion = true;
+          break;
+        }
+      }
+      
+      // For calculation questions, extract numbers from explanation and verify they appear in options
+      if (isCalcQuestion) {
+        // Extract all numbers from explanation (integers and decimals)
+        var expNumbers = q.explanation.match(/\b\d+(?:\.\d+)?\s*(?:mm|d|δ|°|degrees)?\b/gi);
+        if (expNumbers && expNumbers.length > 0) {
+          // Get the correct option text
+          var correctOptionText = q.options[q.correct] || '';
+          
+          // Check if ANY calculated value from explanation appears in the correct option
+          var foundMatch = false;
+          for (var m = 0; m < expNumbers.length; m++) {
+            var expNum = expNumbers[m].replace(/[^0-9.]/g, '');
+            if (correctOptionText.indexOf(expNum) !== -1) {
+              foundMatch = true;
+              break;
+            }
+          }
+          
+          // If no calculated value from explanation matches the correct option, flag it
+          if (!foundMatch && expNumbers.length > 0) {
+            console.warn('⚠️ Question ' + num + ' calculation mismatch: explanation shows ' + expNumbers.slice(0, 3).join(', ') + ' but correct option is "' + correctOptionText + '"');
+            issues.push('calculation result in explanation doesn\'t match correct option');
+          }
+        }
+      }
+    }
+    
+    // ═══ LAYER 4: Option sanity checks ═══
+    if (issues.length === 0 && q.options) {
+      // Check for duplicate options
+      var uniqueOpts = {};
+      for (var p = 0; p < q.options.length; p++) {
+        var opt = q.options[p].trim().toLowerCase();
+        if (uniqueOpts[opt]) {
+          issues.push('duplicate option: "' + q.options[p] + '"');
+          break;
+        }
+        uniqueOpts[opt] = true;
+      }
+      
+      // Check for obviously invalid values
+      var invalidPatterns = [
+        /pd.*?-\d/i,           // Negative PD
+        /axis.*?(?:18[1-9]|19\d|[2-9]\d\d)/i,  // Axis >180°
+        /abbe.*?-\d/i,         // Negative Abbe value
+        /\b0\.0+(?:d|δ|mm)?\b/i,  // Useless 0.00 values in options
+      ];
+      
+      for (var r = 0; r < q.options.length; r++) {
+        for (var s = 0; s < invalidPatterns.length; s++) {
+          if (invalidPatterns[s].test(q.options[r])) {
+            issues.push('option contains invalid value: "' + q.options[r] + '"');
+            break;
+          }
+        }
+      }
+    }
+    
+    // ═══ Accept or reject ═══
+    if (issues.length > 0) {
+      console.error('❌ Question ' + num + ' REJECTED: ' + issues.join('; '));
+      rejectedCount++;
+    } else {
+      validQuestions.push(q);
+    }
   });
+  
+  // ═══ LAYER 5: Warn if too many rejections ═══
+  if (rejectedCount > 0) {
+    var rejectPct = Math.round((rejectedCount / parsed.questions.length) * 100);
+    console.warn('⚠️ Rejected ' + rejectedCount + ' / ' + parsed.questions.length + ' questions (' + rejectPct + '%) due to validation failures');
+    
+    if (rejectPct > 20) {
+      setTimeout(function() {
+        toast('Warning: ' + rejectedCount + ' broken questions removed. Try lowering Temperature or switching models.', 'warning');
+      }, 500);
+    }
+  }
+  
+  if (validQuestions.length === 0) {
+    throw new Error('All generated questions failed validation. Try a different model or lower Temperature setting.');
+  }
 
-  console.log('✅ Parsed ' + parsed.questions.length + ' valid questions');
-  return parsed.questions;
+  console.log('✅ Validated ' + validQuestions.length + ' / ' + parsed.questions.length + ' questions');
+  return validQuestions;
 }
 
 /* ── Main AI load function ── */
