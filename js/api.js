@@ -84,16 +84,57 @@ function buildSystemPrompt() {
     '• Vertex distance: significant when Rx >±4.00D; standard = 12-14mm',
     '• Compensated power = F / (1 - dF) where d=vertex change in meters',
     '',
+    'PROGRESSIVE LENSES (PALs):',
+    '• Corridor length: short (11-14mm), standard (14-17mm), long (>17mm)',
+    '• Fitting height: measure from bottom of lens to pupil center (typically 18-22mm)',
+    '• Minimum fitting height = corridor length + near zone (usually needs 20mm+ for standard PALs)',
+    '• Inset: amount near zone shifts nasally (typically 2-3mm per eye)',
+    '• Add power: difference between distance and near power (common range +0.75 to +3.50)',
+    '',
+    'TORIC CONTACT LENS STABILIZATION:',
+    '• Prism ballast: adds weight at bottom (1.0-1.5Δ typical)',
+    '• Truncation: flat edge at bottom for orientation',
+    '• Thin zones: top/bottom thinner than sides (accelerated stabilization)',
+    '• Rotation: if lens rotates clockwise (right), ADD to axis; counterclockwise (left), SUBTRACT',
+    '• LARS rule: Left Add, Right Subtract',
+    '',
+    'BLANK SIZE & MINIMUM BLANK:',
+    '• Formula: Minimum Blank Diameter = ED + (2 × maximum decentration)',
+    '• ED (Effective Diameter) = diagonal measurement of lens shape',
+    '• Decentration = |PD/2 - DBL/2 - A/2| for each eye',
+    '• Always round UP to nearest standard blank size',
+    '',
+    'PRISM RESOLUTION:',
+    '• Oblique prism resolves into horizontal + vertical components',
+    '• Horizontal component = Total Prism × cos(angle)',
+    '• Vertical component = Total Prism × sin(angle)',
+    '• Combined prism: Total = √(H² + V²)',
+    '• Resultant direction: angle = arctan(V/H)',
+    '',
     'REGULATORY STANDARDS:',
     '• FDA drop ball test: 5/8-inch steel ball from 50 inches (21 CFR 801.410)',
     '• ANSI Z87.1: safety eyewear (industrial/occupational)',
-    '• FTC Eyeglass Rule: must provide Rx to patient without extra charge',
+    '• ANSI Z80.1-2022: prescription ophthalmic lenses (tolerances, testing)',
+    '• FTC Eyeglass Rule (16 CFR 315): must provide Rx to patient without extra charge',
     '• OSHA 29 CFR 1910.133: employer must ensure proper PPE',
+    '• ASTM F803: sports protective eyewear requirements',
     '',
     'LENS DESIGNS:',
     '• FT-28 = flat-top 28mm segment width (standard bifocal)',
+    '• FT-35 = flat-top 35mm segment width (wider field)',
+    '• Executive/Franklin: full-width segment line',
+    '• Ultex/D-segment: rounded bottom bifocal',
     '• PAL zones: distance (top), intermediate (corridor), near (bottom)',
     '• Seg height measurement: from lowest point of lens to seg line',
+    '',
+    'PEDIATRIC CONSIDERATIONS:',
+    '• Frame sizing: use boxing measurements A, B, DBL appropriate for age',
+    '• Children 3-5 years: A~38-42mm, DBL~14-16mm',
+    '• Children 6-10 years: A~42-46mm, DBL~16-18mm',
+    '• Teens 11-17 years: A~46-52mm, DBL~16-20mm',
+    '• Impact resistance mandatory: polycarbonate or Trivex (21 CFR 801.410)',
+    '• Strap retention for infants/toddlers',
+    '• Shorter temple length (typically 120-130mm vs adult 135-150mm)',
     '',
     'ANATOMY:',
     '• Corneal layers (anterior→posterior): Epithelium, Bowman\'s, Stroma (90% thickness), Descemet\'s, Endothelium',
@@ -114,6 +155,14 @@ function buildSystemPrompt() {
     '• Frame measurements: realistic variance (A: 46-60mm, DBL: 14-22mm, temple: 135-150mm)',
     '• Patient ages: children (5-12), teens (13-17), adults (18-65), presbyopes (40+), elderly (65+)',
     '• Alternate formats: direct questions, clinical scenarios, troubleshooting, "best option" choices',
+    '',
+    'NEW QUESTION SUB-TYPES TO USE:',
+    '• Multi-step scenarios: patient presents symptoms → determine cause → recommend solution',
+    '• Troubleshooting chains: "A patient complains X. What would you check FIRST?"',
+    '• Regulation citations: "According to ANSI Z80.1-2022, what is the tolerance for..."',
+    '• Comparative analysis: "Which material is better for a [specific scenario]?"',
+    '• Calculation verification: "A technician calculated X. Is this correct? If not, what\'s right?"',
+    '• "What if" scenarios: "If you change X parameter, what happens to Y?"',
     '',
     'QUESTION STRUCTURE:',
     '• Exactly 4 options (A, B, C, D)',
@@ -157,7 +206,7 @@ function buildSystemPrompt() {
 
 function buildUserPrompt() {
   var domMap = {
-    all:               'all 15 ABO domains with balanced distribution across geometric optics, ophthalmic optics, lens materials/designs, coatings, frames, measurements, dispensing, prescriptions, anatomy, pathology, contact lenses, regulations, safety, and low vision',
+    all:               'all ABO domains with balanced distribution across geometric optics, ophthalmic optics, lens materials/designs, coatings, frames, measurements, dispensing, prescriptions, anatomy, pathology, contact lenses, regulations, safety, low vision, AND the new specialty domains below',
     geometric_optics:  'Geometric Optics: vergence calculations, Snell\'s Law, refraction, lens power relationships, Prentice\'s Rule, critical angle, optical center location',
     ophthalmic_optics: 'Ophthalmic Optics: effective power, Abbe value/chromatic aberration, vertex distance compensation, base curve selection, lensometer verification',
     lens_materials:    'Lens Materials: CR-39, polycarbonate, Trivex, high-index (1.60-1.74), crown glass properties, refractive index, Abbe value, specific gravity, impact resistance',
@@ -173,64 +222,95 @@ function buildUserPrompt() {
     regulations:       'Standards & Regulations: ANSI Z80.1-2022 tolerances, FDA drop ball test (21 CFR 801.410), FTC Eyeglass Rule, state dispensing laws',
     safety_eyewear:    'Safety Eyewear: ANSI Z87.1 marking/testing, ASTM F803 sports protection, OSHA 29 CFR 1910.133, side shields, impact ratings, plano safety',
     low_vision:        'Low Vision: magnification calculations, working distance relationship, optical/electronic devices, eccentric viewing, contrast enhancement',
+    
+    // ═══ NEW SPECIALTY DOMAINS ═══
+    multifocal_design:    'Multifocal Lens Design: PAL corridor calculations, fitting height requirements, minimum fitting height formulas, inset values, add power ranges, blend zones, corridor length trade-offs (short/standard/long), near zone width',
+    advanced_dispensing:  'Advanced Dispensing & Troubleshooting: complex patient complaints (blur zones in PALs, swim effect, peripheral distortion), remake policies, warranty claims, frame repair techniques, adjustment for specific complaints, material failure diagnosis',
+    pediatric_optics:     'Pediatric Optics: children\'s frame sizing by age group, impact resistance requirements for kids (21 CFR 801.410), strap retention systems, developmental visual considerations, school-age accommodation, appropriate lens materials for active children',
+    sports_eyewear:       'Sports & Occupational Eyewear: wrap frame base curves, impact protection levels (ASTM F803), lens tint selection by activity (baseball, shooting, cycling, skiing), prescription swim goggles, industrial safety requirements, side shield mandates',
+    toric_stabilization:  'Toric Contact Lens Stabilization: prism ballast mechanics (typical 1.0-1.5Δ), truncation orientation, thin zone design, rotation compensation (LARS rule), axis verification on eye, over-refraction techniques, residual astigmatism troubleshooting',
+    vertex_effectivity:   'Vertex Distance & Effectivity: compensated power calculations, effectivity formula F/(1-dF), when compensation is required (>±4.00D), frame fit impact on effective power, moving Rx from trial frame to spectacles, high myope considerations',
+    blank_size:           'Blank Size & Decentration: minimum blank diameter formula (ED + 2×decentration), effective diameter calculation, maximum decentration limits, standard blank sizes (60-80mm), when to order oversized blanks, lens cutout for wrap frames',
+    prism_resolution:     'Prism Resolution & Combination: resolving oblique prism into H/V components, combining horizontal + vertical prism, resultant prism calculation, oblique prism prescription notation, splitting prism between eyes, resultant direction angles',
+    regulatory_citations: 'Regulatory Citations & Standards: specific ANSI Z80.1-2022 section references, FDA 21 CFR part numbers, FTC Eyeglass Rule 16 CFR 315 details, state dispensing law differences, OSHA occupational safety requirements, documentation requirements',
   };
+  
   var diffMap = {
     mixed:        'a realistic ABO exam difficulty mix (25% foundation, 50% intermediate, 20% advanced, 5% expert)',
     foundation:   'ONLY foundation level — pure recall, definitions, basic recognition, no calculations',
     intermediate: 'ONLY intermediate level — applied clinical knowledge, straightforward single-step calculations, standard scenarios',
     advanced:     'ONLY advanced level — complex multi-step problems, integration of multiple concepts, nuanced clinical judgment',
     expert:       'ONLY expert level — rare edge cases, exception conditions, barely-covered material, highly specialized scenarios',
-    calculations: 'ONLY calculation-intensive questions — MUST include Prentice\'s Rule, vergence, transposition, spherical equivalent, magnification, blank size, effectivity, or prism resolution. Show your calculation work.',
+    calculations: 'ONLY calculation-intensive questions — MUST include Prentice\'s Rule, vergence, transposition, spherical equivalent, magnification, blank size, effectivity, prism resolution, or PAL fitting calculations. Show your calculation work.',
+    
+    // ═══ NEW SPECIALTY DIFFICULTY MODES ═══
+    weak_areas:      'Focus on COMMON WEAK AREAS where students typically struggle: vertex distance compensation, oblique prism resolution, PAL fitting height calculations, toric rotation (LARS), ANSI tolerance edge cases, minus lens prism direction confusion',
+    calculation_drills: 'RAPID-FIRE CALCULATION DRILLS: quick computational problems with minimal scenario text. Focus purely on math execution: Prentice with diverse values, spherical equivalent, transposition, blank size, prism resolution, effectivity. Vary numbers extensively.',
+    edge_cases:      'EDGE CASES & EXCEPTIONS: unusual but valid scenarios that catch advanced students — extreme prescriptions (>±10.00D), unusual axis values, combined prism, pediatric sizing edge cases, safety standard exceptions, material property trade-offs in rare conditions',
+    patient_scenarios: 'COMPLEX PATIENT SCENARIOS: multi-paragraph case studies requiring integration of 2-4 knowledge domains. Include patient age, occupation, lifestyle, visual complaints, current Rx, and require clinical decision-making across multiple factors.',
   };
   
   // Generate unique session seed for variety
   var sessionSeed = Date.now() % 1000;
   
-  // Expanded rotation through different emphasis areas (12 options instead of 6)
+  // Expanded rotation through different emphasis areas (18 options instead of 12)
   var emphasisOptions = [
     'Emphasize real-world clinical troubleshooting with specific patient complaints and symptoms.',
     'Focus on precise numerical calculations using uncommon parameter combinations and irregular values.',
-    'Include regulation/standard questions citing specific ANSI Z80.1-2022 or FDA 21 CFR sections.',
-    'Test deep conceptual understanding with "why" and "how" questions requiring explanation.',
-    'Use detailed patient case studies requiring integration of 2-3 knowledge domains.',
-    'Challenge with edge cases, exceptions, and scenarios that catch advanced students.',
-    'Frame questions as dispensing dilemmas requiring practical judgment calls.',
-    'Use comparative questions: "Which is better for..." or "What distinguishes X from Y..."',
-    'Test troubleshooting skills: "A patient complains of... what is the most likely cause?"',
-    'Focus on measurement verification and lensometry interpretation scenarios.',
-    'Include frame selection for specific face shapes, lifestyles, or occupations.',
-    'Test material property trade-offs in real prescription scenarios.',
+    'Include regulation/standard questions citing specific ANSI Z80.1-2022 or FDA 21 CFR sections with exact section numbers.',
+    'Test deep conceptual understanding with "why" and "how" questions requiring multi-step reasoning.',
+    'Use detailed patient case studies requiring integration of 3-4 knowledge domains simultaneously.',
+    'Challenge with edge cases, exceptions, and scenarios that catch advanced students off guard.',
+    'Frame questions as dispensing dilemmas requiring practical judgment calls under time pressure.',
+    'Use comparative questions: "Which is better for..." with nuanced trade-offs where 2+ options are partially valid.',
+    'Test troubleshooting skills: "A patient complains of X symptoms. What is the MOST LIKELY cause?"',
+    'Focus on measurement verification and lensometry interpretation with specific readings.',
+    'Include frame selection for highly specific face shapes, lifestyles, or occupational requirements.',
+    'Test material property trade-offs in real prescription scenarios with conflicting priorities.',
+    'Focus on PAL fitting: corridor length selection, fitting height calculations, minimum FH requirements.',
+    'Test pediatric considerations: age-appropriate frame sizing, impact resistance mandates, developmental needs.',
+    'Sports/occupational: specific lens tint recommendations, wrap base curves, impact standards by activity.',
+    'Advanced prism: oblique prism resolution, combining H+V components, splitting prism between eyes.',
+    'Vertex effectivity in high prescriptions: when to compensate, calculation examples, clinical significance.',
+    'Regulatory deep-dive: cite exact ANSI sections, FDA CFR parts, state law variations, documentation requirements.',
   ];
   var randomEmphasis = emphasisOptions[Math.floor(Math.random() * emphasisOptions.length)];
   
-  // Add question format variety (new)
+  // Expanded question format variety (10 options instead of 6)
   var formatOptions = [
-    'Use primarily scenario-based questions with patient details (age, occupation, symptoms).',
-    'Mix direct factual questions with applied clinical decision-making.',
-    'Include "best option" questions where 2-3 answers are partially correct.',
-    'Use troubleshooting format: "Given this problem, what would you check first?"',
-    'Frame questions as conversations: "A patient asks... how would you explain..."',
-    'Include calculation questions with realistic prescription parameters.',
+    'Use primarily scenario-based questions with patient details (age, occupation, symptoms, lifestyle).',
+    'Mix direct factual questions (30%) with applied clinical decision-making (70%).',
+    'Include "best option" questions where 2-3 answers are partially correct but one is MOST appropriate.',
+    'Use troubleshooting format: "Given this problem, what would you check FIRST?" with priority ordering.',
+    'Frame questions as conversations: "A patient asks... how would you explain this concept?"',
+    'Include calculation questions with realistic prescription parameters and complete work shown.',
+    'Use "what if" conditional questions: "If parameter X changes, what happens to result Y?"',
+    'Create verification questions: "A technician calculated X. Is this correct? If not, identify the error."',
+    'Multi-step reasoning chains: Present scenario → ask intermediate diagnostic question → require final solution.',
+    'Comparative analysis: "Compare options A vs B for this specific patient. Which is superior and why?"',
   ];
   var randomFormat = formatOptions[Math.floor(Math.random() * formatOptions.length)];
   
   // Get AI temperature setting (default 0.8)
   var temp = parseFloat(localStorage.getItem('abo_aiTemp')) || 0.8;
   
-  // Enhanced temperature-based variety instructions (5 tiers instead of 3)
-  var varietyNote = temp > 1.0 ? 'MAXIMIZE creativity: use unusual scenarios, rare combinations, and unexpected question angles.' :
-                    temp > 0.85 ? 'Use high creativity in phrasing, scenarios, and parameter selection. Avoid predictable patterns.' :
-                    temp > 0.7 ? 'Balance clinical accuracy with creative variety in question structure and values.' :
-                    temp < 0.5 ? 'Focus on precise, textbook-style questions with standard parameters.' :
-                    'Use moderate variation while maintaining exam realism.';
+  // Enhanced temperature-based variety instructions (5 tiers)
+  var varietyNote = temp > 1.0 ? 'MAXIMIZE creativity: use unusual scenarios, rare combinations, unexpected question angles, and unconventional phrasing.' :
+                    temp > 0.85 ? 'Use high creativity in phrasing, scenarios, and parameter selection. Avoid predictable patterns at all costs.' :
+                    temp > 0.7 ? 'Balance clinical accuracy with creative variety in question structure and numerical values.' :
+                    temp < 0.5 ? 'Focus on precise, textbook-style questions with standard parameters and conventional phrasing.' :
+                    'Use moderate variation while maintaining strict ABO exam realism and clinical accuracy.';
   
   // Numerical diversity guidance
   var numericGuidance = [
-    'Sphere powers: Use values like +1.25, -3.75, +5.50, -7.25, +0.50',
-    'Cylinder powers: Vary between -0.50, -1.25, -2.75, -3.50, not just -0.75/-1.50',
-    'Axes: Strongly prefer oblique axes: 15°, 35°, 55°, 125°, 165° over 90°/180°',
-    'Prism: Use diverse directions and magnitudes: 2.5Δ BU, 4Δ BO, 1.25Δ BD',
-    'Measurements: PD from 54-68mm, seg heights 18-24mm, decentration 3-12mm',
+    'Sphere powers: Use values like +1.25, -3.75, +5.50, -7.25, +0.50, +8.75, -11.00',
+    'Cylinder powers: Vary between -0.50, -1.25, -2.75, -3.50, -4.75, not just -0.75/-1.50',
+    'Axes: Strongly prefer oblique axes: 15°, 35°, 55°, 125°, 165°, 8°, 172° over 90°/180°',
+    'Prism: Use diverse directions and magnitudes: 2.5Δ BU, 4Δ BO, 1.25Δ BD, 3.75Δ BI',
+    'Measurements: PD from 54-68mm, seg heights 16-24mm, decentration 3-15mm',
+    'Add powers: Vary from +0.75 to +3.50 (not always +2.00 or +2.50)',
+    'Vertex distances: 10mm, 12mm, 14mm, 16mm (not always standard 13mm)',
+    'Frame dimensions: A from 46-58mm, DBL from 14-22mm, B from 38-52mm',
   ].join('\n• ');
   
   return [
@@ -248,19 +328,23 @@ function buildUserPrompt() {
     '',
     'AVOID THESE PATTERNS (they make questions feel scripted):',
     '• DO NOT use sphere powers like ±2.00, ±4.00, ±6.00 repeatedly',
-    '• DO NOT default to 90° or 180° axis — use oblique axes 70% of the time',
-    '• DO NOT make every bifocal an FT-28 — include FT-35, D-segment, Ultex',
+    '• DO NOT default to 90° or 180° axis — use oblique axes 70%+ of the time',
+    '• DO NOT make every bifocal an FT-28 — include FT-35, D-segment, Ultex, Executive',
     '• DO NOT always use standard PD (63mm) — vary between 54-68mm realistically',
-    '• DO NOT phrase all questions the same way (What is, Which of the following, etc.)',
-    '• DO NOT make the correct answer always option B or C — truly randomize',
+    '• DO NOT phrase all questions identically ("What is...", "Which of the following...")',
+    '• DO NOT make the correct answer always option B or C — truly randomize across A/B/C/D',
+    '• DO NOT use only healthy adults — include children, elderly, high Rx, occupational needs',
+    '• DO NOT ignore the new specialty domains — integrate them when generating "all domains" questions',
     '',
     'CRITICAL REQUIREMENTS:',
-    '• Each question must be DISTINCT — no overlapping topics',
-    '• Use diverse numerical values (avoid common numbers like ±2.00, 90°, 6/6)',
-    '• Vary question formats (direct, scenario-based, troubleshooting, "best option")',
-    '• Distribute correct answers evenly across A/B/C/D positions',
-    '• All calculations must use ABO-accurate values (see system prompt)',
-    '• Explanations must show formulas and calculation steps',
+    '• Each question must be DISTINCT — no overlapping topics within the same batch',
+    '• Use diverse numerical values (avoid common numbers like ±2.00, 90°, 63mm PD)',
+    '• Vary question formats (direct, scenario, troubleshooting, "best option", "what if")',
+    '• Distribute correct answers evenly across A/B/C/D positions (aim for 25% each)',
+    '• All calculations must use ABO-accurate formulas and values (see system prompt)',
+    '• Explanations must show formulas, cite standards, and explain why wrong answers are wrong',
+    '• For multi-step scenarios, include enough detail for complete clinical reasoning',
+    '• When using specialty domains, demonstrate deep knowledge of that specific area',
     '',
     'Return ONLY raw JSON with NO markdown, NO code fences, NO commentary.',
   ].join('\n');
