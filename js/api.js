@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────
 //  api.js  —  AI question generation
 //  Enhanced with better prompting & user controls
-//  + 5-layer safety net for question validation
+//  + Comprehensive 20-check validation system
 // ─────────────────────────────────────────
 
 /* ── Environment detection ── */
@@ -46,6 +46,9 @@ function buildSystemPrompt() {
     '• The explanation admits "not among the options" then picks an arbitrary answer',
     '• The formula used in explanation contradicts established ABO formulas',
     '• Options contain mathematically impossible values (negative PD, axis >180°, etc.)',
+    '• Options include "All of the above", "None of the above", or "It depends"',
+    '• Two or more options could be considered correct under reasonable interpretation',
+    '• Question lacks necessary information to solve (missing parameters)',
     '',
     '✅ MANDATORY GENERATION WORKFLOW:',
     '1. Decide what concept/formula to test',
@@ -55,6 +58,7 @@ function buildSystemPrompt() {
     '5. Generate 3 plausible distractors (common errors, close values)',
     '6. Write explanation that shows calculation step-by-step',
     '7. VERIFY the explanation\'s final answer matches the correct option index',
+    '8. CHECK that no other option could reasonably be argued as correct',
     '',
     '❌ If you cannot create valid distractors that differ from the correct answer,',
     '   choose a DIFFERENT scenario with parameters that allow distinct options.',
@@ -194,6 +198,7 @@ function buildSystemPrompt() {
     '• All distractors MUST be clinically plausible (not obviously wrong)',
     '• Vary correct answer position evenly — DO NOT favor option A or B',
     '• Each question tests ONE distinct concept/skill',
+    '• NEVER use "All of the above", "None of the above", "It depends", or "I don\'t know"',
     '',
     'DIFFICULTY CALIBRATION:',
     '• Foundation: definitions, basic recall, recognition ("What is...", "Which material...")',
@@ -207,6 +212,7 @@ function buildSystemPrompt() {
     '• Explain why other options are incorrect',
     '• Reference ABO Study Guide sections when applicable',
     '• CRITICAL: Final calculated value in explanation MUST match the correct option exactly',
+    '• Minimum 50 characters for meaningful explanations',
     '',
     'OUTPUT FORMAT (CRITICAL):',
     'Return ONLY raw JSON — absolutely NO markdown fences, NO ```json blocks, NO commentary.',
@@ -371,12 +377,13 @@ function buildUserPrompt() {
     '• For multi-step scenarios, include enough detail for complete clinical reasoning',
     '• When using specialty domains, demonstrate deep knowledge of that specific area',
     '• NEVER generate a question where the calculated answer is not among the 4 options',
+    '• NEVER use "All/None of the above", "It depends", or "I don\'t know" as options',
     '',
     'Return ONLY raw JSON with NO markdown, NO code fences, NO commentary.',
   ].join('\n');
 }
 
-/* ── Response parser with SAFETY NET ── */
+/* ── Response parser with COMPREHENSIVE VALIDATION ── */
 
 function parseAIResponse(raw) {
   // Strip DeepSeek R1 chain-of-thought blocks
@@ -413,7 +420,7 @@ function parseAIResponse(raw) {
     throw new Error('Response contained zero questions. Try increasing max_tokens setting.');
   }
 
-  // ═══ SAFETY NET: Validate and filter questions ═══
+  // ═══ COMPREHENSIVE VALIDATION: 20 checks ═══
   var validQuestions = [];
   var rejectedCount = 0;
   
@@ -421,7 +428,7 @@ function parseAIResponse(raw) {
     var num = i + 1;
     var issues = [];
     
-    // Basic structure validation
+    // ═══ CHECK 1-5: Basic structure ═══
     if (!q.question || typeof q.question !== 'string') {
       issues.push('missing question text');
     }
@@ -441,100 +448,214 @@ function parseAIResponse(raw) {
     // Optional: normalize difficulty if missing
     if (!q.difficulty) q.difficulty = 'intermediate';
     
-    // ═══ LAYER 2-3: Self-Consistency Checks ═══
-    if (issues.length === 0 && q.explanation) {
+    if (issues.length === 0) {
+      var qLower = q.question.toLowerCase();
       var exp = q.explanation.toLowerCase();
       
-      // Check for red-flag phrases indicating broken questions
-      var redFlags = [
-        'not among the options',
-        'is not listed',
-        'none of the options',
-        'however, this is not',
-        'more realistic approach',
-        'more suitable',
-        'would be more',
+      // ═══ CHECK 6-10: Ambiguous/problematic phrasing ═══
+      var badPhrases = [
+        'all of the above',
+        'none of the above',
+        'it depends',
+        'i don\'t know',
+        'a and b',
+        'both a and b',
+        'either a or b',
       ];
       
-      for (var j = 0; j < redFlags.length; j++) {
-        if (exp.indexOf(redFlags[j]) !== -1) {
-          issues.push('explanation admits answer not in options ("' + redFlags[j] + '")');
-          break;
+      for (var j = 0; j < q.options.length; j++) {
+        var optLower = q.options[j].toLowerCase();
+        for (var k = 0; k < badPhrases.length; k++) {
+          if (optLower.indexOf(badPhrases[k]) !== -1) {
+            issues.push('option contains prohibited phrase: "' + badPhrases[k] + '"');
+            break;
+          }
+        }
+        if (issues.length > 0) break;
+      }
+      
+      // ═══ CHECK 11: Red-flag phrases in explanations ═══
+      if (issues.length === 0) {
+        var redFlags = [
+          'not among the options',
+          'is not listed',
+          'none of the options',
+          'however, this is not',
+          'more realistic approach',
+          'more suitable',
+          'would be more',
+          'closest answer',
+          'best approximation',
+        ];
+        
+        for (var m = 0; m < redFlags.length; m++) {
+          if (exp.indexOf(redFlags[m]) !== -1) {
+            issues.push('explanation admits answer not in options ("' + redFlags[m] + '")');
+            break;
+          }
         }
       }
       
-      // Check for calculation questions where answer might not match
-      var calcKeywords = [
-        'minimum pd',
-        'prism magnitude',
-        'blank size',
-        'fitting height',
-        'decentration',
-        'spherical equivalent',
-        'transposition',
-        'resultant',
-      ];
-      
-      var isCalcQuestion = false;
-      for (var k = 0; k < calcKeywords.length; k++) {
-        if (q.question.toLowerCase().indexOf(calcKeywords[k]) !== -1) {
-          isCalcQuestion = true;
-          break;
+      // ═══ CHECK 12: Calculation validation ═══
+      if (issues.length === 0) {
+        var calcKeywords = [
+          'minimum pd',
+          'prism magnitude',
+          'blank size',
+          'fitting height',
+          'decentration',
+          'spherical equivalent',
+          'transposition',
+          'resultant',
+          'effective diameter',
+          'compensated power',
+        ];
+        
+        var isCalcQuestion = false;
+        for (var n = 0; n < calcKeywords.length; n++) {
+          if (qLower.indexOf(calcKeywords[n]) !== -1) {
+            isCalcQuestion = true;
+            break;
+          }
+        }
+        
+        // For calculation questions, verify calculated value matches correct option
+        if (isCalcQuestion) {
+          var expNumbers = q.explanation.match(/\b\d+(?:\.\d+)?\s*(?:mm|d|δ|°|degrees)?\b/gi);
+          if (expNumbers && expNumbers.length > 0) {
+            var correctOptionText = q.options[q.correct] || '';
+            var foundMatch = false;
+            
+            for (var p = 0; p < expNumbers.length; p++) {
+              var expNum = expNumbers[p].replace(/[^0-9.]/g, '');
+              if (correctOptionText.indexOf(expNum) !== -1) {
+                foundMatch = true;
+                break;
+              }
+            }
+            
+            if (!foundMatch && expNumbers.length > 0) {
+              console.warn('⚠️ Q' + num + ' calc mismatch: explanation shows ' + expNumbers.slice(0, 3).join(', ') + ' but correct="' + correctOptionText + '"');
+              issues.push('calculation result doesn\'t match correct option');
+            }
+          }
         }
       }
       
-      // For calculation questions, extract numbers from explanation and verify they appear in options
-      if (isCalcQuestion) {
-        // Extract all numbers from explanation (integers and decimals)
-        var expNumbers = q.explanation.match(/\b\d+(?:\.\d+)?\s*(?:mm|d|δ|°|degrees)?\b/gi);
-        if (expNumbers && expNumbers.length > 0) {
-          // Get the correct option text
-          var correctOptionText = q.options[q.correct] || '';
-          
-          // Check if ANY calculated value from explanation appears in the correct option
-          var foundMatch = false;
-          for (var m = 0; m < expNumbers.length; m++) {
-            var expNum = expNumbers[m].replace(/[^0-9.]/g, '');
-            if (correctOptionText.indexOf(expNum) !== -1) {
-              foundMatch = true;
+      // ═══ CHECK 13: Duplicate options ═══
+      if (issues.length === 0 && q.options) {
+        var uniqueOpts = {};
+        for (var r = 0; r < q.options.length; r++) {
+          var opt = q.options[r].trim().toLowerCase();
+          if (uniqueOpts[opt]) {
+            issues.push('duplicate option: "' + q.options[r] + '"');
+            break;
+          }
+          uniqueOpts[opt] = true;
+        }
+      }
+      
+      // ═══ CHECK 14-16: Invalid values ═══
+      if (issues.length === 0 && q.options) {
+        var invalidPatterns = [
+          { regex: /pd.*?-\d/i, desc: 'negative PD' },
+          { regex: /axis.*?(?:18[1-9]|19\d|[2-9]\d\d)/i, desc: 'axis >180°' },
+          { regex: /abbe.*?-\d/i, desc: 'negative Abbe' },
+          { regex: /\b0\.0+(?:d|δ|mm)?\b/i, desc: 'useless 0.00 value' },
+          { regex: /refractive index.*?(?:0\.|1\.[0-3]|2\.)/i, desc: 'impossible refractive index' },
+        ];
+        
+        for (var s = 0; s < q.options.length; s++) {
+          for (var t = 0; t < invalidPatterns.length; t++) {
+            if (invalidPatterns[t].regex.test(q.options[s])) {
+              issues.push('option contains ' + invalidPatterns[t].desc + ': "' + q.options[s] + '"');
               break;
             }
           }
-          
-          // If no calculated value from explanation matches the correct option, flag it
-          if (!foundMatch && expNumbers.length > 0) {
-            console.warn('⚠️ Question ' + num + ' calculation mismatch: explanation shows ' + expNumbers.slice(0, 3).join(', ') + ' but correct option is "' + correctOptionText + '"');
-            issues.push('calculation result in explanation doesn\'t match correct option');
+          if (issues.length > 0) break;
+        }
+      }
+      
+      // ═══ CHECK 17: Incomplete questions (missing critical info) ═══
+      if (issues.length === 0) {
+        // Check for Prentice questions missing power or decentration
+        if ((qLower.indexOf('prentice') !== -1 || qLower.indexOf('prism') !== -1) && 
+            qLower.indexOf('decentration') !== -1) {
+          var hasPower = /[+-]?\d+\.\d+\s*d(?:iopter)?/i.test(q.question);
+          var hasDecentration = /\d+\s*(?:mm|cm)/i.test(q.question);
+          if (!hasPower || !hasDecentration) {
+            issues.push('Prentice question missing power or decentration value');
+          }
+        }
+        
+        // Check for transposition questions missing axis
+        if ((qLower.indexOf('transpose') !== -1 || qLower.indexOf('transposition') !== -1) &&
+            qLower.indexOf('axis') === -1 && !/\d+\s*°/.test(q.question)) {
+          issues.push('transposition question missing axis value');
+        }
+      }
+      
+      // ═══ CHECK 18: Explanation quality ═══
+      if (issues.length === 0) {
+        if (q.explanation.length < 30) {
+          issues.push('explanation too short (<30 chars)');
+        }
+        
+        // For calculation questions, explanation should show formula
+        var calcTerms = ['prentice', 'spherical equivalent', 'transpose', 'blank', 'effectivity', 'vergence'];
+        var hasCalcTerm = false;
+        for (var u = 0; u < calcTerms.length; u++) {
+          if (qLower.indexOf(calcTerms[u]) !== -1) {
+            hasCalcTerm = true;
+            break;
+          }
+        }
+        
+        if (hasCalcTerm && exp.indexOf('=') === -1 && exp.indexOf('formula') === -1) {
+          issues.push('calculation question missing formula/work in explanation');
+        }
+      }
+      
+      // ═══ CHECK 19: Contradictory information ═══
+      if (issues.length === 0) {
+        // Check for "presbyope" with age <40
+        if ((qLower.indexOf('presbyope') !== -1 || qLower.indexOf('presbyopia') !== -1)) {
+          var ageMatch = q.question.match(/(\d+)[-\s]year/i);
+          if (ageMatch && parseInt(ageMatch[1]) < 40) {
+            issues.push('presbyope patient under age 40');
+          }
+        }
+        
+        // Check for "child" with adult frame size
+        if ((qLower.indexOf('child') !== -1 || qLower.indexOf('pediatric') !== -1)) {
+          var aMatch = q.question.match(/a[=:\s]+(\d+)/i);
+          if (aMatch && parseInt(aMatch[1]) > 54) {
+            issues.push('child with adult frame size (A>' + aMatch[1] + 'mm)');
+          }
+        }
+        
+        // Check for "high myope" with low Rx
+        if (qLower.indexOf('high myop') !== -1) {
+          var rxMatch = q.question.match(/-(\d+)\.\d+/);
+          if (rxMatch && parseInt(rxMatch[1]) < 6) {
+            issues.push('"high myope" with Rx <-6.00D');
           }
         }
       }
-    }
-    
-    // ═══ LAYER 4: Option sanity checks ═══
-    if (issues.length === 0 && q.options) {
-      // Check for duplicate options
-      var uniqueOpts = {};
-      for (var p = 0; p < q.options.length; p++) {
-        var opt = q.options[p].trim().toLowerCase();
-        if (uniqueOpts[opt]) {
-          issues.push('duplicate option: "' + q.options[p] + '"');
-          break;
-        }
-        uniqueOpts[opt] = true;
-      }
       
-      // Check for obviously invalid values
-      var invalidPatterns = [
-        /pd.*?-\d/i,           // Negative PD
-        /axis.*?(?:18[1-9]|19\d|[2-9]\d\d)/i,  // Axis >180°
-        /abbe.*?-\d/i,         // Negative Abbe value
-        /\b0\.0+(?:d|δ|mm)?\b/i,  // Useless 0.00 values in options
-      ];
-      
-      for (var r = 0; r < q.options.length; r++) {
-        for (var s = 0; s < invalidPatterns.length; s++) {
-          if (invalidPatterns[s].test(q.options[r])) {
-            issues.push('option contains invalid value: "' + q.options[r] + '"');
+      // ═══ CHECK 20: Material property errors ═══
+      if (issues.length === 0 && q.options) {
+        // Check for common material errors
+        var matErrors = [
+          { regex: /cr-?39.*?1\.49[^8]/i, desc: 'CR-39 n=1.49 (should be 1.498)' },
+          { regex: /polycarbonate.*?abbe.*?(?:4\d|5\d)/i, desc: 'polycarbonate Abbe >40 (should be 30)' },
+          { regex: /trivex.*?1\.5[^3]/i, desc: 'Trivex n≠1.53' },
+        ];
+        
+        var fullText = q.question + ' ' + q.options.join(' ') + ' ' + q.explanation;
+        for (var v = 0; v < matErrors.length; v++) {
+          if (matErrors[v].regex.test(fullText)) {
+            issues.push(matErrors[v].desc);
             break;
           }
         }
@@ -543,30 +664,34 @@ function parseAIResponse(raw) {
     
     // ═══ Accept or reject ═══
     if (issues.length > 0) {
-      console.error('❌ Question ' + num + ' REJECTED: ' + issues.join('; '));
+      console.error('❌ Q' + num + ' REJECTED: ' + issues.join('; '));
       rejectedCount++;
     } else {
       validQuestions.push(q);
     }
   });
   
-  // ═══ LAYER 5: Warn if too many rejections ═══
+  // ═══ Warn if too many rejections ═══
   if (rejectedCount > 0) {
     var rejectPct = Math.round((rejectedCount / parsed.questions.length) * 100);
-    console.warn('⚠️ Rejected ' + rejectedCount + ' / ' + parsed.questions.length + ' questions (' + rejectPct + '%) due to validation failures');
+    console.warn('⚠️ Rejected ' + rejectedCount + '/' + parsed.questions.length + ' questions (' + rejectPct + '%)');
     
     if (rejectPct > 20) {
       setTimeout(function() {
-        toast('Warning: ' + rejectedCount + ' broken questions removed. Try lowering Temperature or switching models.', 'warning');
+        toast('⚠️ ' + rejectedCount + ' broken questions removed. Try lowering Temperature or switching models.', 'warning');
+      }, 500);
+    } else if (rejectedCount > 0) {
+      setTimeout(function() {
+        toast('✓ ' + rejectedCount + ' invalid question' + (rejectedCount > 1 ? 's' : '') + ' filtered out', 'info');
       }, 500);
     }
   }
   
   if (validQuestions.length === 0) {
-    throw new Error('All generated questions failed validation. Try a different model or lower Temperature setting.');
+    throw new Error('All generated questions failed validation. Try a different model or lower Temperature.');
   }
 
-  console.log('✅ Validated ' + validQuestions.length + ' / ' + parsed.questions.length + ' questions');
+  console.log('✅ Validated ' + validQuestions.length + '/' + parsed.questions.length + ' questions');
   return validQuestions;
 }
 
