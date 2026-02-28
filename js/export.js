@@ -9,15 +9,23 @@ const Export = {
   // Get stored data from correct location
   getStore: function() {
     try {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{"sessions":[],"ds":{}}');
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      console.log('[Export] Raw localStorage data:', raw);
+      const parsed = JSON.parse(raw || '{"sessions":[],"ds":{}}');
+      console.log('[Export] Parsed data:', parsed);
+      console.log('[Export] Sessions count:', parsed.sessions ? parsed.sessions.length : 0);
+      return parsed;
     } catch (e) {
+      console.error('[Export] Error reading storage:', e);
       return { sessions: [], ds: {} };
     }
   },
   
   // Calculate overall stats from sessions
   calculateOverallStats: function(sessions) {
+    console.log('[Export] Calculating stats for sessions:', sessions);
     if (!sessions || sessions.length === 0) {
+      console.log('[Export] No sessions found, returning zeros');
       return {
         totalQuestions: 0,
         correct: 0,
@@ -33,6 +41,8 @@ const Export = {
     const correct = sessions.reduce((sum, s) => sum + (s.correct || 0), 0);
     const accuracy = totalQuestions > 0 ? Math.round((correct / totalQuestions) * 100) : 0;
     
+    console.log('[Export] Calculated stats:', { totalQuestions, correct, accuracy });
+    
     return {
       totalQuestions: totalQuestions,
       correct: correct,
@@ -46,6 +56,7 @@ const Export = {
   
   // Generate comprehensive study report data
   generateReportData: function() {
+    console.log('[Export] Generating report data...');
     const store = this.getStore();
     const overall = this.calculateOverallStats(store.sessions);
     const analytics = window.Analytics ? Analytics.exportData() : null;
@@ -53,7 +64,7 @@ const Export = {
     const streaks = window.Analytics ? Analytics.getStreakInfo() : null;
     const userInfo = this.getUserInfo();
     
-    return {
+    const reportData = {
       generatedAt: new Date().toISOString(),
       generatedDate: new Date().toLocaleDateString(),
       studentName: userInfo.name,
@@ -69,6 +80,9 @@ const Export = {
       sessionHistory: store.sessions.slice(0, 20),
       examReadiness: this.calculateExamReadiness(overall, store.ds)
     };
+    
+    console.log('[Export] Report data generated:', reportData);
+    return reportData;
   },
   
   // Get user information
@@ -580,6 +594,7 @@ const Export = {
   
   // Open report in new window
   viewReport: function() {
+    console.log('[Export] Opening report in new window...');
     const html = this.generateHTMLReport();
     const newWindow = window.open('', '_blank', 'width=900,height=800');
     if (newWindow) {
