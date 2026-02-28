@@ -129,7 +129,9 @@
 
   <div class="card">
     <div class="ctitle">&#128218; Content Domain</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;">📁 Core domains work in Offline & AI modes | ⚡ Specialty domains are <strong>AI-only</strong></p>
     <div class="dgrid" id="domain-grid" role="group" aria-label="Content Domain">
+      <!-- CORE DOMAINS (16) -->
       <button class="dbtn on" data-d="all"><span class="di">&#128301;</span><div class="dn">All Domains</div><div class="ds">Full ABO blueprint</div></button>
       <button class="dbtn" data-d="geometric_optics"><span class="di">&#128302;</span><div class="dn">Geometric Optics</div><div class="ds">Light, vergence, refraction</div></button>
       <button class="dbtn" data-d="ophthalmic_optics"><span class="di">&#128301;</span><div class="dn">Ophthalmic Optics</div><div class="ds">Lens power, prism, Abbe</div></button>
@@ -146,18 +148,37 @@
       <button class="dbtn" data-d="regulations"><span class="di">&#9878;</span><div class="dn">Regulations</div><div class="ds">ANSI, Z87.1, FDA</div></button>
       <button class="dbtn" data-d="safety_eyewear"><span class="di">&#129366;</span><div class="dn">Safety Eyewear</div><div class="ds">Industrial, sports, OSHA</div></button>
       <button class="dbtn" data-d="low_vision"><span class="di">&#128270;</span><div class="dn">Low Vision</div><div class="ds">Magnifiers, aids</div></button>
+      
+      <!-- ⚡ NEW SPECIALTY DOMAINS (9) - AI ONLY -->
+      <button class="dbtn" data-d="multifocal_design" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Multifocal Design</div><div class="ds">PAL corridor, fitting height</div></button>
+      <button class="dbtn" data-d="advanced_dispensing" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Advanced Dispensing</div><div class="ds">Complex troubleshooting</div></button>
+      <button class="dbtn" data-d="pediatric_optics" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Pediatric Optics</div><div class="ds">Children's sizing, impact</div></button>
+      <button class="dbtn" data-d="sports_eyewear" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Sports Eyewear</div><div class="ds">Wrap frames, activities</div></button>
+      <button class="dbtn" data-d="toric_stabilization" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Toric Stabilization</div><div class="ds">LARS rule, rotation</div></button>
+      <button class="dbtn" data-d="vertex_effectivity" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Vertex Effectivity</div><div class="ds">High Rx compensation</div></button>
+      <button class="dbtn" data-d="blank_size" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Blank Size</div><div class="ds">Min blank calculations</div></button>
+      <button class="dbtn" data-d="prism_resolution" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Prism Resolution</div><div class="ds">Oblique prism, H/V</div></button>
+      <button class="dbtn" data-d="regulatory_citations" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Regulatory Citations</div><div class="ds">ANSI/FDA sections</div></button>
     </div>
   </div>
 
   <div class="card">
     <div class="ctitle">&#9889; Difficulty</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;">🎯 Standard modes work everywhere | ⚡ Advanced modes are <strong>AI-only</strong></p>
     <div class="dfgrid" id="diff-grid" role="group" aria-label="Difficulty">
+      <!-- STANDARD DIFFICULTY (6) -->
       <button class="dfbtn on" data-df="mixed"><div class="dfbadge" style="background:rgba(99,179,237,.1);color:#63b3ed">Mixed</div><div class="dfname">Balanced</div><div class="dfdesc">Real ABO distribution</div></button>
       <button class="dfbtn" data-df="foundation"><div class="dfbadge" style="background:rgba(104,211,145,.1);color:#68d391">Foundation</div><div class="dfname">Foundational</div><div class="dfdesc">Definitions, basic recall</div></button>
       <button class="dfbtn" data-df="intermediate"><div class="dfbadge" style="background:rgba(246,173,85,.1);color:#f6ad55">Intermediate</div><div class="dfname">Intermediate</div><div class="dfdesc">Applied, moderate calc</div></button>
       <button class="dfbtn" data-df="advanced"><div class="dfbadge" style="background:rgba(252,129,129,.1);color:#fc8181">Advanced</div><div class="dfname">Advanced</div><div class="dfdesc">Complex multi-step</div></button>
       <button class="dfbtn" data-df="expert"><div class="dfbadge" style="background:rgba(183,148,244,.1);color:#b794f4">Expert</div><div class="dfname">Expert</div><div class="dfdesc">Edge cases, nuance</div></button>
       <button class="dfbtn" data-df="calculations"><div class="dfbadge" style="background:rgba(118,228,247,.1);color:#76e4f7">Calc</div><div class="dfname">Calculations</div><div class="dfdesc">Prentice, vergence, prism</div></button>
+      
+      <!-- ⚡ NEW ADVANCED MODES (4) - AI ONLY -->
+      <button class="dfbtn" data-df="weak_areas" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(252,129,129,.12);color:#fc8181">⚡ Weak Areas</div><div class="dfname">Common Mistakes</div><div class="dfdesc">Where students struggle</div></button>
+      <button class="dfbtn" data-df="calculation_drills" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(118,228,247,.12);color:#76e4f7">⚡ Drills</div><div class="dfname">Rapid Calculations</div><div class="dfdesc">Pure computational practice</div></button>
+      <button class="dfbtn" data-df="edge_cases" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(183,148,244,.12);color:#b794f4">⚡ Edge Cases</div><div class="dfname">Tricky Scenarios</div><div class="dfdesc">Unusual but valid cases</div></button>
+      <button class="dfbtn" data-df="patient_scenarios" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(246,173,85,.12);color:#f6ad55">⚡ Clinical</div><div class="dfname">Patient Cases</div><div class="dfdesc">Multi-domain integration</div></button>
     </div>
   </div>
 
