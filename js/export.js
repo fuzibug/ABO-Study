@@ -3,13 +3,54 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const Export = {
+  // Storage key - MUST match progress.js
+  STORAGE_KEY: 'abo5',
+  
+  // Get stored data from correct location
+  getStore: function() {
+    try {
+      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{"sessions":[],"ds":{}}');
+    } catch (e) {
+      return { sessions: [], ds: {} };
+    }
+  },
+  
+  // Calculate overall stats from sessions
+  calculateOverallStats: function(sessions) {
+    if (!sessions || sessions.length === 0) {
+      return {
+        totalQuestions: 0,
+        correct: 0,
+        incorrect: 0,
+        accuracy: 0,
+        avgTime: 0,
+        totalStudyTime: 0,
+        sessionsCompleted: 0
+      };
+    }
+    
+    const totalQuestions = sessions.reduce((sum, s) => sum + (s.total || 0), 0);
+    const correct = sessions.reduce((sum, s) => sum + (s.correct || 0), 0);
+    const accuracy = totalQuestions > 0 ? Math.round((correct / totalQuestions) * 100) : 0;
+    
+    return {
+      totalQuestions: totalQuestions,
+      correct: correct,
+      incorrect: totalQuestions - correct,
+      accuracy: accuracy,
+      avgTime: 0, // Not tracked yet
+      totalStudyTime: 0, // Not tracked yet
+      sessionsCompleted: sessions.length
+    };
+  },
+  
   // Generate comprehensive study report data
   generateReportData: function() {
+    const store = this.getStore();
+    const overall = this.calculateOverallStats(store.sessions);
     const analytics = window.Analytics ? Analytics.exportData() : null;
     const srs = window.SRS ? SRS.getStatistics() : null;
-    const progress = JSON.parse(localStorage.getItem('progress') || '{}');
     const streaks = window.Analytics ? Analytics.getStreakInfo() : null;
-    const sessionHistory = this.getSessionHistory();
     const userInfo = this.getUserInfo();
     
     return {
@@ -17,24 +58,16 @@ const Export = {
       generatedDate: new Date().toLocaleDateString(),
       studentName: userInfo.name,
       userInfo: userInfo,
-      overall: {
-        totalQuestions: progress.totalAnswered || 0,
-        correct: progress.correct || 0,
-        incorrect: (progress.totalAnswered || 0) - (progress.correct || 0),
-        accuracy: progress.accuracy || 0,
-        avgTime: progress.avgTime || 0,
-        totalStudyTime: progress.totalTime || 0,
-        sessionsCompleted: sessionHistory.length
-      },
+      overall: overall,
       streaks: streaks,
       srs: srs,
       analytics: analytics,
-      domains: this.getDomainSummary(),
-      weakAreas: this.getWeakAreas(),
-      strongAreas: this.getStrongAreas(),
-      recommendations: this.getRecommendations(),
-      sessionHistory: sessionHistory,
-      examReadiness: this.calculateExamReadiness()
+      domains: this.getDomainSummary(store.ds),
+      weakAreas: this.getWeakAreas(store.ds),
+      strongAreas: this.getStrongAreas(store.ds),
+      recommendations: this.getRecommendations(store, overall),
+      sessionHistory: store.sessions.slice(0, 20),
+      examReadiness: this.calculateExamReadiness(overall, store.ds)
     };
   },
   
@@ -62,50 +95,52 @@ const Export = {
     return diffDays > 0 ? diffDays : 0;
   },
   
-  // Get session history
-  getSessionHistory: function() {
-    const sessions = JSON.parse(localStorage.getItem('session_history') || '[]');
-    return sessions.slice(-20); // Last 20 sessions
-  },
-  
   // Get domain summary with detailed stats
-  getDomainSummary: function() {
-    if (!window.Analytics) return [];
-    return Analytics.getDomainComparison().map(d => ({
-      ...d,
-      grade: this.getGrade(parseFloat(d.accuracy)),
-      status: this.getStatus(parseFloat(d.accuracy))
-    }));
+  getDomainSummary: function(ds) {
+    if (!ds || Object.keys(ds).length === 0) return [];
+    
+    return Object.keys(ds).map(domain => {
+      const stats = ds[domain];
+      const accuracy = stats.t > 0 ? Math.round((stats.c / stats.t) * 100) : 0;
+      const domainMeta = window.DM && window.DM[domain] ? window.DM[domain] : { l: domain, i: '?' };
+      
+      return {
+        domain: domainMeta.l || domain,
+        accuracy: accuracy,
+        total: stats.t,
+        correct: stats.c,
+        grade: this.getGrade(accuracy),
+        status: this.getStatus(accuracy)
+      };
+    }).sort((a, b) => a.accuracy - b.accuracy); // Sort worst to best
   },
   
   // Get weak areas
-  getWeakAreas: function() {
-    if (!window.Analytics) return [];
-    return Analytics.getWeakDomains(70);
+  getWeakAreas: function(ds) {
+    const domains = this.getDomainSummary(ds);
+    return domains.filter(d => d.accuracy < 70);
   },
   
   // Get strong areas
-  getStrongAreas: function() {
-    if (!window.Analytics) return [];
-    const domains = Analytics.getDomainComparison();
+  getStrongAreas: function(ds) {
+    const domains = this.getDomainSummary(ds);
     return domains
-      .filter(d => parseFloat(d.accuracy) >= 85)
-      .sort((a, b) => parseFloat(b.accuracy) - parseFloat(a.accuracy))
+      .filter(d => d.accuracy >= 85)
+      .sort((a, b) => b.accuracy - a.accuracy)
       .slice(0, 5);
   },
   
   // Calculate exam readiness score
-  calculateExamReadiness: function() {
-    const progress = JSON.parse(localStorage.getItem('progress') || '{}');
-    const accuracy = progress.accuracy || 0;
-    const totalAnswered = progress.totalAnswered || 0;
-    const domains = this.getDomainSummary();
+  calculateExamReadiness: function(overall, ds) {
+    const accuracy = overall.accuracy || 0;
+    const totalAnswered = overall.totalQuestions || 0;
+    const domains = this.getDomainSummary(ds);
     
     // Factors: overall accuracy, volume, domain balance
     const accuracyScore = Math.min(accuracy / 75, 1) * 50; // Max 50 points
     const volumeScore = Math.min(totalAnswered / 200, 1) * 25; // Max 25 points
     const domainScore = domains.length > 0 
-      ? (domains.filter(d => parseFloat(d.accuracy) >= 70).length / domains.length) * 25
+      ? (domains.filter(d => d.accuracy >= 70).length / domains.length) * 25
       : 0; // Max 25 points
     
     const totalScore = accuracyScore + volumeScore + domainScore;
@@ -140,11 +175,22 @@ const Export = {
   },
   
   // Generate recommendations
-  getRecommendations: function() {
-    const weak = this.getWeakAreas();
+  getRecommendations: function(store, overall) {
+    const weak = this.getWeakAreas(store.ds);
     const srs = window.SRS ? SRS.getStatistics() : null;
-    const overall = JSON.parse(localStorage.getItem('progress') || '{}');
     const recommendations = [];
+    
+    // Check if user has no data
+    if (!store.sessions || store.sessions.length === 0) {
+      recommendations.push({
+        priority: 'High',
+        area: 'Get Started',
+        suggestion: 'No practice sessions completed yet',
+        action: 'Complete your first exam to begin tracking progress',
+        icon: '🚀'
+      });
+      return recommendations;
+    }
     
     // Weak domains
     if (weak.length > 0) {
@@ -152,7 +198,7 @@ const Export = {
         priority: 'High',
         area: 'Weak Domains',
         suggestion: `Focus on: ${weak.slice(0, 3).map(d => d.domain).join(', ')}`,
-        action: 'Use Weak Domain Focus Mode for targeted practice',
+        action: 'Use domain-specific practice mode for targeted improvement',
         icon: '🎯'
       });
     }
@@ -169,7 +215,7 @@ const Export = {
     }
     
     // Volume
-    const total = overall.totalAnswered || 0;
+    const total = overall.totalQuestions || 0;
     if (total < 100) {
       recommendations.push({
         priority: 'Medium',
@@ -187,7 +233,7 @@ const Export = {
         priority: 'High',
         area: 'Overall Accuracy',
         suggestion: `Current accuracy ${acc}% is below passing threshold`,
-        action: 'Review explanations carefully and use flashcards for weak topics',
+        action: 'Review explanations carefully and focus on weak domains',
         icon: '⚠️'
       });
     }
@@ -201,6 +247,17 @@ const Export = {
         suggestion: 'Build a daily study habit',
         action: 'Study at least 10 questions per day to build momentum',
         icon: '🔥'
+      });
+    }
+    
+    // Success message
+    if (acc >= 85 && total >= 200) {
+      recommendations.push({
+        priority: 'Low',
+        area: 'Excellent Progress',
+        suggestion: 'You are performing at a high level!',
+        action: 'Continue practicing and consider taking the official ABO exam soon',
+        icon: '⭐'
       });
     }
     
@@ -221,7 +278,7 @@ const Export = {
     
     URL.revokeObjectURL(url);
     
-    if (window.toast) window.toast('Report exported as JSON', 'success');
+    if (window.toast) window.toast('Report exported as JSON', true);
   },
   
   // Export as CSV
@@ -244,7 +301,7 @@ const Export = {
     csv += `Correct,${data.overall.correct}\n`;
     csv += `Incorrect,${data.overall.incorrect}\n`;
     csv += `Accuracy,${data.overall.accuracy}%\n`;
-    csv += `Average Time,${data.overall.avgTime}s\n\n`;
+    csv += `Sessions,${data.overall.sessionsCompleted}\n\n`;
     
     // Exam readiness
     csv += 'EXAM READINESS\n';
@@ -252,12 +309,14 @@ const Export = {
     csv += `Level,${data.examReadiness.level}\n\n`;
     
     // Domain breakdown
-    csv += 'DOMAIN PERFORMANCE\n';
-    csv += 'Domain,Accuracy,Questions,Grade,Status\n';
-    data.domains.forEach(d => {
-      csv += `${d.domain},${d.accuracy}%,${d.total},${d.grade},${d.status}\n`;
-    });
-    csv += '\n';
+    if (data.domains.length > 0) {
+      csv += 'DOMAIN PERFORMANCE\n';
+      csv += 'Domain,Accuracy,Questions,Grade,Status\n';
+      data.domains.forEach(d => {
+        csv += `${d.domain},${d.accuracy}%,${d.total},${d.grade},${d.status}\n`;
+      });
+      csv += '\n';
+    }
     
     // Recommendations
     if (data.recommendations.length > 0) {
@@ -278,12 +337,15 @@ const Export = {
     
     URL.revokeObjectURL(url);
     
-    if (window.toast) window.toast('Report exported as CSV', 'success');
+    if (window.toast) window.toast('Report exported as CSV', true);
   },
   
   // Generate enhanced HTML report (for printing or PDF)
   generateHTMLReport: function() {
     const data = this.generateReportData();
+    
+    // Check if user has any data
+    const hasData = data.overall.sessionsCompleted > 0;
     
     let html = `
 <!DOCTYPE html>
@@ -306,6 +368,8 @@ const Export = {
     h3 { color: #555; margin-top: 20px; }
     .header { text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; }
     .header h1 { color: white; border: none; margin: 0; }
+    .no-data-message { background: #fff3cd; border: 2px solid #ffc107; padding: 30px; border-radius: 10px; text-align: center; margin: 40px 0; }
+    .no-data-message h2 { border: none; color: #856404; margin: 0 0 15px 0; }
     .user-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #3b82f6; }
     .user-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
     .user-info-item { display: flex; flex-direction: column; }
@@ -412,6 +476,13 @@ const Export = {
     </div>
   </div>
   
+  ${!hasData ? `
+  <div class="no-data-message">
+    <h2>🚀 No Study Data Yet</h2>
+    <p style="font-size: 16px; margin: 20px 0;">You haven't completed any practice sessions yet. Start your first exam to begin tracking your progress!</p>
+    <p style="font-size: 14px; color: #856404;">Your statistics, domain performance, and personalized recommendations will appear here after you complete exams.</p>
+  </div>
+  ` : `
   <h2>📊 Overall Performance</h2>
   <div class="stat-container">
     <div class="stat-box">
@@ -431,10 +502,6 @@ const Export = {
       <div class="stat-value" style="color: ${data.overall.accuracy >= 75 ? '#28a745' : data.overall.accuracy >= 60 ? '#ffc107' : '#dc3545'};">${data.overall.accuracy}%</div>
     </div>
     <div class="stat-box">
-      <div class="stat-label">Avg Time</div>
-      <div class="stat-value">${data.overall.avgTime}s</div>
-    </div>
-    <div class="stat-box">
       <div class="stat-label">Sessions</div>
       <div class="stat-value">${data.overall.sessionsCompleted}</div>
     </div>
@@ -445,24 +512,6 @@ const Export = {
     <div class="readiness-level">🎯 ${data.examReadiness.level}</div>
     <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;">Accuracy: ${data.examReadiness.breakdown.accuracy}/50 | Volume: ${data.examReadiness.breakdown.volume}/25 | Balance: ${data.examReadiness.breakdown.balance}/25</p>
   </div>
-  
-  ${data.streaks ? `
-  <h2>🔥 Study Streaks</h2>
-  <div class="stat-container">
-    <div class="stat-box">
-      <div class="stat-label">Current Streak</div>
-      <div class="stat-value" style="color: #ff6b6b;">🔥 ${data.streaks.currentStreak}</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">Longest Streak</div>
-      <div class="stat-value" style="color: #ffd93d;">🏆 ${data.streaks.longestStreak}</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">Total Study Days</div>
-      <div class="stat-value">${data.streaks.totalDays || 0}</div>
-    </div>
-  </div>
-  ` : ''}
   
   ${data.domains.length > 0 ? `
   <h2>🎓 Domain Performance</h2>
@@ -493,55 +542,7 @@ const Export = {
     </tbody>
   </table>
   ` : ''}
-  
-  ${data.strongAreas && data.strongAreas.length > 0 ? `
-  <h2>💪 Strong Areas</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Domain</th>
-        <th>Accuracy</th>
-        <th>Questions</th>
-      </tr>
-    </thead>
-    <tbody>
-    ${data.strongAreas.map(d => `
-      <tr>
-        <td><strong>${d.domain}</strong></td>
-        <td style="color: #28a745; font-weight: bold;">${d.accuracy}%</td>
-        <td>${d.total}</td>
-      </tr>
-    `).join('')}
-    </tbody>
-  </table>
-  ` : ''}
-  
-  ${data.weakAreas && data.weakAreas.length > 0 ? `
-  <h2>⚠️ Areas Needing Improvement</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Domain</th>
-        <th>Accuracy</th>
-        <th>Questions</th>
-        <th>Gap to Passing</th>
-      </tr>
-    </thead>
-    <tbody>
-    ${data.weakAreas.map(d => {
-      const gap = Math.max(0, 75 - parseFloat(d.accuracy));
-      return `
-      <tr>
-        <td><strong>${d.domain}</strong></td>
-        <td style="color: #dc3545; font-weight: bold;">${d.accuracy}%</td>
-        <td>${d.total}</td>
-        <td><span class="badge badge-danger">${gap.toFixed(1)}% below passing</span></td>
-      </tr>
-      `;
-    }).join('')}
-    </tbody>
-  </table>
-  ` : ''}
+  `}
   
   ${data.recommendations.length > 0 ? `
   <h2>💡 Personalized Recommendations</h2>
@@ -561,12 +562,12 @@ const Export = {
   <div class="footer">
     <p><strong>Generated by ABO Study Tool</strong></p>
     <p>🌐 <a href="https://fuzibug.github.io/ABO-Study/">fuzibug.github.io/ABO-Study</a></p>
-    <p style="margin-top: 15px;">Keep up the great work! You're on the path to ABO certification success. 🚀</p>
+    <p style="margin-top: 15px;">${hasData ? 'Keep up the great work! You\'re on the path to ABO certification success. 🚀' : 'Start your first practice exam to begin tracking your journey to ABO certification! 🚀'}</p>
     <p style="margin-top: 10px; font-size: 10px; color: #999;">Report ID: ${data.generatedAt}</p>
   </div>
   
   <div class="no-print" style="text-align: center; margin: 40px 0; padding: 30px; background: #f8f9fa; border-radius: 10px;">
-    <h3>📥 Save This Report</h3>
+    <h3>🖨️ Save This Report</h3>
     <p>Click Print and choose "Save as PDF" to create a permanent record</p>
     <button onclick="window.print()" style="padding: 12px 30px; font-size: 16px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: bold;">🖨️ Print / Save as PDF</button>
   </div>
