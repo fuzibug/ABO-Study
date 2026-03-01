@@ -3,613 +3,696 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ABO Exam Prep | Smart Study Platform</title>
-  <meta name="description" content="AI-powered ABO certification exam preparation with adaptive learning">
+  <title>ABO Mock Exam</title>
+  <meta name="description" content="Professional ABO/NCLE certification exam preparation with AI, spaced repetition, and interactive tools">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#6366f1">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #8b5cf6;
-      --success: #10b981;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --surface-light: #334155;
-      --text: #f1f5f9;
-      --text-dim: #94a3b8;
-      --border: #334155;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    /* Header */
-    .header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      padding: 40px 20px;
-      text-align: center;
-      border-radius: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
-    }
-    
-    .header h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    
-    .header p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-    
-    /* Navigation */
-    .nav {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-      background: var(--surface);
-      padding: 10px;
-      border-radius: 15px;
-      overflow-x: auto;
-    }
-    
-    .nav-btn {
-      flex: 1;
-      min-width: 120px;
-      padding: 12px 20px;
-      background: transparent;
-      border: 2px solid transparent;
-      color: var(--text-dim);
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s;
-      white-space: nowrap;
-    }
-    
-    .nav-btn:hover {
-      background: var(--surface-light);
-      color: var(--text);
-    }
-    
-    .nav-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-    
-    /* Cards */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .card-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .card-subtitle {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-    }
-    
-    /* Buttons */
-    .btn {
-      padding: 14px 28px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-    }
-    
-    .btn-secondary {
-      background: var(--surface-light);
-      color: var(--text);
-    }
-    
-    .btn-secondary:hover {
-      background: var(--border);
-    }
-    
-    /* Grid layouts */
-    .grid {
-      display: grid;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    
-    .grid-2 {
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-    
-    .grid-3 {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-    
-    /* Option buttons */
-    .option-grid {
-      display: grid;
-      gap: 12px;
-    }
-    
-    .option {
-      background: var(--surface-light);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .option:hover {
-      background: var(--surface);
-      border-color: var(--primary);
-    }
-    
-    .option.selected {
-      background: rgba(99, 102, 241, 0.2);
-      border-color: var(--primary);
-    }
-    
-    .option.correct {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: var(--success);
-    }
-    
-    .option.incorrect {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: var(--danger);
-    }
-    
-    .option-label {
-      width: 32px;
-      height: 32px;
-      background: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    
-    /* Stats */
-    .stat-box {
-      background: var(--surface-light);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    
-    .stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 5px;
-    }
-    
-    .stat-label {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    /* Progress bar */
-    .progress {
-      height: 8px;
-      background: var(--surface-light);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      transition: width 0.5s ease;
-    }
-    
-    /* Input fields */
-    .input-group {
-      margin-bottom: 20px;
-    }
-    
-    .input-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--text);
-    }
-    
-    .input {
-      width: 100%;
-      padding: 12px;
-      background: var(--surface-light);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-size: 1rem;
-    }
-    
-    .input:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    
-    /* Toggle switch */
-    .toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px;
-      background: var(--surface-light);
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .switch {
-      position: relative;
-      width: 50px;
-      height: 28px;
-      background: var(--border);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    
-    .switch.active {
-      background: var(--primary);
-    }
-    
-    .switch-slider {
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 22px;
-      height: 22px;
-      background: white;
-      border-radius: 50%;
-      transition: 0.3s;
-    }
-    
-    .switch.active .switch-slider {
-      left: 25px;
-    }
-    
-    /* Hide sections by default */
-    .section {
-      display: none;
-    }
-    
-    .section.active {
-      display: block;
-    }
-    
-    /* Toast notification */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--surface);
-      padding: 15px 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      transform: translateX(400px);
-      transition: transform 0.3s;
-      z-index: 1000;
-    }
-    
-    .toast.show {
-      transform: translateX(0);
-    }
-    
-    /* Loading spinner */
-    .spinner {
-      border: 3px solid var(--surface-light);
-      border-top: 3px solid var(--primary);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header h1 {
-        font-size: 1.8rem;
-      }
-      
-      .nav {
-        flex-wrap: wrap;
-      }
-      
-      .nav-btn {
-        flex: 1 1 calc(50% - 5px);
-      }
-    }
-  </style>
+  <meta name="theme-color" content="#3b82f6">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/appearance.css">
+  <link rel="stylesheet" href="css/formulas.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>👁️ ABO Exam Prep</h1>
-      <p>AI-Powered Certification Study Platform</p>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<main class="wrap" id="main-content">
+<div class="hdr">
+  <div class="badge">&#128065; American Board of Opticianry</div>
+  <h1>ABO Mock Exam</h1>
+  <p class="sub">Practice across all official ABO/NCLE content domains</p>
+</div>
+
+<!-- SETUP -->
+<div id="pg-setup" class="page show">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab on" id="t-setup"  role="tab" aria-selected="true"  aria-controls="pg-setup">&#128203; New Exam</button>
+    <button class="tab"    id="t-prog"   role="tab" aria-selected="false" aria-controls="pg-prog">&#128200; Progress</button>
+    <button class="tab"    id="t-tools"  role="tab" aria-selected="false" aria-controls="pg-tools">&#128295; Study Tools</button>
+    <button class="tab"    id="t-appear" role="tab" aria-selected="false" aria-controls="pg-appear">&#127914; Appearance</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#127918; Question Source</div>
+    <div class="mode-row">
+      <div class="mode-text">
+        <div class="mode-label" id="mode-label">Offline Bank</div>
+        <div class="mode-sub" id="mode-sub">90+ verified questions — works without internet</div>
+      </div>
+      <div class="tog-wrap">
+        <span class="tog-lbl active" id="lbl-off">Offline</span>
+        <label class="tog"><input type="checkbox" id="mode-chk"><span class="tog-track"></span></label>
+        <span class="tog-lbl" id="lbl-ai">AI</span>
+      </div>
     </div>
-    
-    <nav class="nav">
-      <button class="nav-btn active" data-section="setup">📚 Study</button>
-      <button class="nav-btn" data-section="quiz">📝 Quiz</button>
-      <button class="nav-btn" data-section="progress">📊 Progress</button>
-      <button class="nav-btn" data-section="settings">⚙️ Settings</button>
-    </nav>
-    
-    <!-- Setup Section -->
-    <section id="setup" class="section active">
-      <div class="card">
-        <div class="card-title">🎯 Configure Your Study Session</div>
-        <p class="card-subtitle">Choose your preferences to start practicing</p>
-        
-        <div class="input-group">
-          <label class="input-label">Study Mode</label>
-          <div class="grid grid-2">
-            <button class="option selected" data-mode="ai">
-              <div class="option-label">🤖</div>
-              <div>
-                <div style="font-weight: 600;">AI Generated</div>
-                <div style="font-size: 0.85rem; color: var(--text-dim);">Fresh, adaptive questions</div>
-              </div>
-            </button>
-            <button class="option" data-mode="offline">
-              <div class="option-label">📦</div>
-              <div>
-                <div style="font-weight: 600;">Question Bank</div>
-                <div style="font-size: 0.85rem; color: var(--text-dim);">90+ verified questions</div>
-              </div>
-            </button>
-          </div>
+
+    <div class="ai-panel" id="ai-panel">
+      <div class="ctitle" style="margin-top:14px">&#127916; AI Provider</div>
+      <div class="provider-grid">
+        <div class="prov-card on" id="prov-groq">
+          <div class="prov-name">Groq</div>
+          <div class="prov-tag">&#9889; Lightning Fast</div>
+          <div class="prov-desc">Dedicated LPU hardware delivers responses in &lt;2 sec. Best for rapid-fire practice. Generous free tier — no credit card required.</div>
         </div>
-        
-        <div class="input-group" id="ai-settings">
-          <label class="input-label">AI Provider & API Key</label>
-          <select class="input" id="ai-provider">
-            <option value="groq">Groq (Fast, Free)</option>
-            <option value="openai">OpenAI (Most Accurate)</option>
-            <option value="anthropic">Anthropic Claude</option>
-          </select>
-          <input type="password" class="input" id="api-key" placeholder="Enter API key..." style="margin-top: 10px;">
-          <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 8px;">
-            Get free Groq key at <a href="https://console.groq.com/keys" target="_blank" style="color: var(--primary);">console.groq.com/keys</a>
-          </p>
+     </div>
+      <div class="file-warn" id="file-warn">
+        <div class="file-warn-icon">&#9888;&#65039;</div>
+        <div class="file-warn-body">
+          <strong>Running from file://</strong> — browsers block API calls from local files.
+          The app will try a CORS proxy automatically. If that fails, run a local server:
+          <code>python3 -m http.server 8080</code> then open <code>localhost:8080</code>.
         </div>
-        
-        <div class="input-group">
-          <label class="input-label">Domain Focus</label>
-          <select class="input" id="domain">
-            <option value="all">All Domains (Comprehensive)</option>
-            <option value="geometric_optics">Geometric Optics</option>
-            <option value="ophthalmic_optics">Ophthalmic Optics</option>
-            <option value="lens_materials">Lens Materials</option>
-            <option value="lens_designs">Lens Designs</option>
-            <option value="coatings">Coatings & Treatments</option>
-            <option value="frames">Frame Selection</option>
-            <option value="measurements">Measurements</option>
-            <option value="dispensing">Dispensing</option>
-            <option value="prescriptions">Prescriptions</option>
-            <option value="contact_lenses">Contact Lenses</option>
-            <option value="regulations">Regulations & Standards</option>
-          </select>
-        </div>
-        
-        <div class="input-group">
-          <label class="input-label">Difficulty Level</label>
-          <div class="grid grid-3">
-            <button class="option" data-diff="foundation">
-              <div class="option-label" style="background: var(--success);">🟢</div>
-              <div style="font-weight: 600;">Foundation</div>
-            </button>
-            <button class="option selected" data-diff="intermediate">
-              <div class="option-label" style="background: var(--warning);">🟡</div>
-              <div style="font-weight: 600;">Intermediate</div>
-            </button>
-            <button class="option" data-diff="advanced">
-              <div class="option-label" style="background: var(--danger);">🔴</div>
-              <div style="font-weight: 600;">Advanced</div>
-            </button>
-          </div>
-        </div>
-        
-        <div class="input-group">
-          <label class="input-label">Number of Questions: <span id="q-count">10</span></label>
-          <input type="range" class="input" id="question-count" min="5" max="50" value="10" step="5" style="accent-color: var(--primary);">
-        </div>
-        
-        <div class="toggle">
-          <span>Timed Mode (60s per question)</span>
-          <div class="switch" id="timed-toggle">
-            <div class="switch-slider"></div>
-          </div>
-        </div>
-        
-        <button class="btn btn-primary" id="start-btn" style="width: 100%; font-size: 1.1rem;">
-          🚀 Start Study Session
-        </button>
       </div>
-    </section>
-    
-    <!-- Quiz Section -->
-    <section id="quiz" class="section">
-      <div class="progress">
-        <div class="progress-fill" id="quiz-progress" style="width: 0%"></div>
+      <div class="model-section show" id="ms-groq">
+        <div class="models-ctitle">Select Groq Model</div>
+        <div class="model-list" id="ml-groq">
+          <div class="mc on" data-mid="llama-3.3-70b-versatile">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Llama 3.3 70B Versatile</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fast</span><span class="mbadge mb-smart">Best Overall</span></div>
+              <div class="mc-why">Meta's latest flagship on Groq LPU. Excellent clinical reasoning, accurate ABO calculations, reliable JSON. <strong>Best starting choice.</strong></div>
+            </div>
+          </div>
+          <div class="mc" data-mid="meta-llama/llama-4-scout-17b-16e-instruct">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Llama 4 Scout 17B</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fast</span><span class="mbadge mb-reason">Backup</span></div>
+              <div class="mc-why">Meta's Llama 4 Scout — fast and efficient 17B model. Great backup when 3.3 is rate-limited. Strong structured output and optics content.</div>
+            </div>
+          </div>
+          <div class="mc" data-mid="qwen/qwen3-32b">
+            <div class="mc-dot"></div>
+            <div class="mc-info">
+              <div class="mc-name">Qwen3 32B</div>
+              <div class="mc-badges"><span class="mbadge mb-free">Free</span><span class="mbadge mb-fast">Fast</span></div>
+              <div class="mc-why">Alibaba's Qwen3 32B — excellent JSON schema compliance and strong reasoning. Best alternative when Llama models are rate-limited.</div>
+            </div>
+          </div>
+        </div>
+        <div class="api-hint">Get a free Groq key (no card) at <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></div>
+        <div class="api-row" style="margin-top:8px">
+          <input class="api-input" type="password" id="key-groq" placeholder="Groq API key…" autocomplete="off">
+          <button class="api-save" id="save-groq">Save</button>
+        </div>
+        <div class="api-status" id="status-groq"></div>
       </div>
+
+      <div class="card" style="margin-top:16px;background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.15)">
+        <div class="ctitle">⚙️ AI Generation Settings</div>
+        <p style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Fine-tune how the AI generates questions. Changes apply to next generation.</p>
+        
+        <div class="sgrid" style="grid-template-columns:1fr;gap:16px">
+          <div class="sbox">
+            <span class="slabel">Temperature (Creativity)</span>
+            <div class="rng-wrap">
+              <input type="range" id="rng-ai-temp" min="0.3" max="1.2" step="0.1" value="0.8">
+              <span class="rng-val" id="rv-ai-temp">0.8</span>
+            </div>
+            <span class="sbox-desc">Low (0.3-0.5) = consistent, predictable | High (0.9-1.2) = creative, varied</span>
+          </div>
+          
+          <div class="sbox">
+            <span class="slabel">Max Tokens (Response Length)</span>
+            <div class="rng-wrap">
+              <input type="range" id="rng-ai-tokens" min="2048" max="16384" step="2048" value="8192">
+              <span class="rng-val" id="rv-ai-tokens">8192</span>
+            </div>
+            <span class="sbox-desc">Higher = longer responses (prevents cut-off), but slower & more expensive</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#128218; Content Domain</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;">📁 Core domains work in Offline & AI modes | ⚡ Specialty domains are <strong>AI-only</strong></p>
+    <div class="dgrid" id="domain-grid" role="group" aria-label="Content Domain">
+      <!-- CORE DOMAINS (16) -->
+      <button class="dbtn on" data-d="all"><span class="di">&#128301;</span><div class="dn">All Domains</div><div class="ds">Full ABO blueprint</div></button>
+      <button class="dbtn" data-d="geometric_optics"><span class="di">&#128302;</span><div class="dn">Geometric Optics</div><div class="ds">Light, vergence, refraction</div></button>
+      <button class="dbtn" data-d="ophthalmic_optics"><span class="di">&#128301;</span><div class="dn">Ophthalmic Optics</div><div class="ds">Lens power, prism, Abbe</div></button>
+      <button class="dbtn" data-d="lens_materials"><span class="di">&#128142;</span><div class="dn">Lens Materials</div><div class="ds">CR-39, poly, high-index</div></button>
+      <button class="dbtn" data-d="lens_designs"><span class="di">&#128083;</span><div class="dn">Lens Designs</div><div class="ds">Bifocal, trifocal, PAL</div></button>
+      <button class="dbtn" data-d="coatings"><span class="di">&#10024;</span><div class="dn">Coatings</div><div class="ds">AR, UV, photochromic</div></button>
+      <button class="dbtn" data-d="frame_selection"><span class="di">&#128246;</span><div class="dn">Frames</div><div class="ds">Materials, fit, face shapes</div></button>
+      <button class="dbtn" data-d="measurements"><span class="di">&#128208;</span><div class="dn">Measurements</div><div class="ds">PD, seg height, vertex</div></button>
+      <button class="dbtn" data-d="dispensing"><span class="di">&#128295;</span><div class="dn">Dispensing</div><div class="ds">Fitting, adjusting</div></button>
+      <button class="dbtn" data-d="prescriptions"><span class="di">&#128203;</span><div class="dn">Prescriptions</div><div class="ds">Rx, transposition, tolerances</div></button>
+      <button class="dbtn" data-d="anatomy"><span class="di">&#129514;</span><div class="dn">Ocular Anatomy</div><div class="ds">Eye structures</div></button>
+      <button class="dbtn" data-d="pathology"><span class="di">&#127973;</span><div class="dn">Pathology</div><div class="ds">Cataracts, glaucoma, AMD</div></button>
+      <button class="dbtn" data-d="contact_lenses"><span class="di">&#128065;</span><div class="dn">Contact Lenses</div><div class="ds">Types, Dk/t, fitting</div></button>
+      <button class="dbtn" data-d="regulations"><span class="di">&#9878;</span><div class="dn">Regulations</div><div class="ds">ANSI, Z87.1, FDA</div></button>
+      <button class="dbtn" data-d="safety_eyewear"><span class="di">&#129366;</span><div class="dn">Safety Eyewear</div><div class="ds">Industrial, sports, OSHA</div></button>
+      <button class="dbtn" data-d="low_vision"><span class="di">&#128270;</span><div class="dn">Low Vision</div><div class="ds">Magnifiers, aids</div></button>
       
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <div style="color: var(--text-dim);">Question <span id="q-num">1</span> of <span id="q-total">10</span></div>
-          <div id="timer" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);"></div>
-        </div>
-        
-        <div id="question-text" style="font-size: 1.2rem; margin-bottom: 25px; line-height: 1.8;">
-          Loading question...
-        </div>
-        
-        <div class="option-grid" id="options">
-          <div class="spinner"></div>
-        </div>
-        
-        <div id="explanation" style="display: none; margin-top: 20px; padding: 20px; background: var(--surface-light); border-radius: 10px; border-left: 4px solid var(--primary);">
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button class="btn btn-secondary" id="quit-btn">← Quit</button>
-          <button class="btn btn-primary" id="next-btn" style="margin-left: auto; display: none;">Next →</button>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Progress Section -->
-    <section id="progress" class="section">
-      <div class="card">
-        <div class="card-title">📊 Your Performance</div>
-        <div class="grid grid-3">
-          <div class="stat-box">
-            <div class="stat-value" id="total-qs">0</div>
-            <div class="stat-label">Questions</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" id="accuracy" style="color: var(--success);">0%</div>
-            <div class="stat-label">Accuracy</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-value" id="sessions">0</div>
-            <div class="stat-label">Sessions</div>
-          </div>
-        </div>
-      </div>
+      <!-- ⚡ NEW SPECIALTY DOMAINS (9) - AI ONLY -->
+      <button class="dbtn" data-d="multifocal_design" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Multifocal Design</div><div class="ds">PAL corridor, fitting height</div></button>
+      <button class="dbtn" data-d="advanced_dispensing" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Advanced Dispensing</div><div class="ds">Complex troubleshooting</div></button>
+      <button class="dbtn" data-d="pediatric_optics" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Pediatric Optics</div><div class="ds">Children's sizing, impact</div></button>
+      <button class="dbtn" data-d="sports_eyewear" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Sports Eyewear</div><div class="ds">Wrap frames, activities</div></button>
+      <button class="dbtn" data-d="toric_stabilization" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Toric Stabilization</div><div class="ds">LARS rule, rotation</div></button>
+      <button class="dbtn" data-d="vertex_effectivity" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Vertex Effectivity</div><div class="ds">High Rx compensation</div></button>
+      <button class="dbtn" data-d="blank_size" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Blank Size</div><div class="ds">Min blank calculations</div></button>
+      <button class="dbtn" data-d="prism_resolution" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Prism Resolution</div><div class="ds">Oblique prism, H/V</div></button>
+      <button class="dbtn" data-d="regulatory_citations" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><span class="di">⚡</span><div class="dn">Regulatory Citations</div><div class="ds">ANSI/FDA sections</div></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#9889; Difficulty</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;">🎯 Standard modes work everywhere | ⚡ Advanced modes are <strong>AI-only</strong></p>
+    <div class="dfgrid" id="diff-grid" role="group" aria-label="Difficulty">
+      <!-- STANDARD DIFFICULTY (6) -->
+      <button class="dfbtn on" data-df="mixed"><div class="dfbadge" style="background:rgba(99,179,237,.1);color:#63b3ed">Mixed</div><div class="dfname">Balanced</div><div class="dfdesc">Real ABO distribution</div></button>
+      <button class="dfbtn" data-df="foundation"><div class="dfbadge" style="background:rgba(104,211,145,.1);color:#68d391">Foundation</div><div class="dfname">Foundational</div><div class="dfdesc">Definitions, basic recall</div></button>
+      <button class="dfbtn" data-df="intermediate"><div class="dfbadge" style="background:rgba(246,173,85,.1);color:#f6ad55">Intermediate</div><div class="dfname">Intermediate</div><div class="dfdesc">Applied, moderate calc</div></button>
+      <button class="dfbtn" data-df="advanced"><div class="dfbadge" style="background:rgba(252,129,129,.1);color:#fc8181">Advanced</div><div class="dfname">Advanced</div><div class="dfdesc">Complex multi-step</div></button>
+      <button class="dfbtn" data-df="expert"><div class="dfbadge" style="background:rgba(183,148,244,.1);color:#b794f4">Expert</div><div class="dfname">Expert</div><div class="dfdesc">Edge cases, nuance</div></button>
+      <button class="dfbtn" data-df="calculations"><div class="dfbadge" style="background:rgba(118,228,247,.1);color:#76e4f7">Calc</div><div class="dfname">Calculations</div><div class="dfdesc">Prentice, vergence, prism</div></button>
       
-      <div class="card">
-        <div class="card-title">📈 Domain Breakdown</div>
-        <div id="domain-stats">
-          <p style="color: var(--text-dim); text-align: center; padding: 40px;">
-            Complete a study session to see your domain performance
-          </p>
+      <!-- ⚡ NEW ADVANCED MODES (4) - AI ONLY -->
+      <button class="dfbtn" data-df="weak_areas" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(252,129,129,.12);color:#fc8181">⚡ Weak Areas</div><div class="dfname">Common Mistakes</div><div class="dfdesc">Where students struggle</div></button>
+      <button class="dfbtn" data-df="calculation_drills" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(118,228,247,.12);color:#76e4f7">⚡ Drills</div><div class="dfname">Rapid Calculations</div><div class="dfdesc">Pure computational practice</div></button>
+      <button class="dfbtn" data-df="edge_cases" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(183,148,244,.12);color:#b794f4">⚡ Edge Cases</div><div class="dfname">Tricky Scenarios</div><div class="dfdesc">Unusual but valid cases</div></button>
+      <button class="dfbtn" data-df="patient_scenarios" style="background:rgba(99,179,237,.03);border-color:rgba(99,179,237,.2);"><div class="dfbadge" style="background:rgba(246,173,85,.12);color:#f6ad55">⚡ Clinical</div><div class="dfname">Patient Cases</div><div class="dfdesc">Multi-domain integration</div></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#9881; Settings</div>
+    <div class="sgrid">
+      <div class="sbox">
+        <span class="slabel">Questions</span>
+        <div class="rng-wrap">
+          <input type="range" id="rng-count" min="5" max="50" step="5" value="10">
+          <span class="rng-val" id="rv-count">10</span>
         </div>
+        <span class="sbox-desc">5 to 50 per session</span>
       </div>
-      
-      <div class="card">
-        <div class="card-title">🔥 Recent Sessions</div>
-        <div id="session-history">
-          <p style="color: var(--text-dim); text-align: center; padding: 40px;">
-            No sessions yet - start studying!
-          </p>
+      <div class="sbox">
+        <span class="slabel">Timer Per Question</span>
+        <div class="rng-wrap">
+          <input type="range" id="rng-timer" min="15" max="120" step="15" value="60">
+          <span class="rng-val" id="rv-timer">60s</span>
         </div>
+        <span class="sbox-desc">When timed mode is enabled</span>
       </div>
-      
-      <button class="btn btn-secondary" id="export-btn">📄 Export Report</button>
-      <button class="btn btn-secondary" id="clear-btn" style="float: right; background: var(--danger);">🗑️ Clear Data</button>
-    </section>
-    
-    <!-- Settings Section -->
-    <section id="settings" class="section">
-      <div class="card">
-        <div class="card-title">⚙️ Preferences</div>
-        
-        <div class="toggle">
-          <span>Show Explanations Immediately</span>
-          <div class="switch active" id="explain-toggle">
-            <div class="switch-slider"></div>
-          </div>
+      <div class="sbox">
+        <span class="slabel">Explanations</span>
+        <div class="seg" id="seg-explain">
+          <button class="sgbtn on" data-v="immediate">Immediate</button>
+          <button class="sgbtn" data-v="end">At End</button>
+          <button class="sgbtn" data-v="never">Off</button>
         </div>
-        
-        <div class="toggle">
-          <span>Shuffle Answer Options</span>
-          <div class="switch active" id="shuffle-toggle">
-            <div class="switch-slider"></div>
-          </div>
-        </div>
-        
-        <div class="toggle">
-          <span>Dark Mode</span>
-          <div class="switch active" id="theme-toggle">
-            <div class="switch-slider"></div>
-          </div>
-        </div>
-        
-        <div class="input-group">
-          <label class="input-label">Student Name (for reports)</label>
-          <input type="text" class="input" id="student-name" placeholder="Your name...">
-        </div>
-        
-        <div class="input-group">
-          <label class="input-label">Exam Date (optional)</label>
-          <input type="date" class="input" id="exam-date">
-        </div>
-        
-        <button class="btn btn-primary" id="save-settings">💾 Save Settings</button>
+        <span class="sbox-desc">When to show answer rationale</span>
       </div>
-    </section>
+      <div class="sbox">
+        <span class="slabel">Mode</span>
+        <div class="seg" id="seg-exammode">
+          <button class="sgbtn on" data-v="practice">Practice</button>
+          <button class="sgbtn" data-v="exam">Exam</button>
+        </div>
+        <span class="sbox-desc" id="exammode-desc">Live score shown</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Timed Mode</span>
+        <div class="tog-row">
+          <span class="tog-state" id="timer-state">Off</span>
+          <label class="tog"><input type="checkbox" id="chk-timer"><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Countdown per question</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Shuffle Answers</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="shuffle-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-shuffle" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Randomize option order</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Domain Tag</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="dtag-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-dtag" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Show domain label on question</span>
+      </div>
+      <div class="sbox">
+        <span class="slabel">Difficulty Tag</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="dftag-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-dftag" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Show difficulty badge on question</span>
+      </div>
+    </div>
+  </div>
+  <button class="btn-go" id="btn-start" aria-label="Begin Mock Exam">&#9654;&#160;&#160;Begin Mock Exam</button>
+</div>
+
+<!-- PROGRESS -->
+<div id="pg-prog" class="page">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab" id="t-setup2">&#128203; New Exam</button>
+    <button class="tab on" id="t-prog2">&#128200; Progress</button>
+    <button class="tab" id="t-tools2">&#128295; Study Tools</button>
+    <button class="tab" id="t-appear2">&#127914; Appearance</button>
   </div>
   
-  <div class="toast" id="toast"></div>
+  <!-- Daily Challenge Card -->
+  <div class="card" id="daily-challenge-card" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;">
+    <div class="ctitle" style="color:white;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:24px;">🎯</span>
+      <span>Daily Challenge</span>
+    </div>
+    <div id="daily-challenge-content" style="margin-top:16px;">
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:48px;margin-bottom:12px;">🔥</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Loading today's challenge...</div>
+      </div>
+    </div>
+  </div>
   
-  <script src="js/app.js"></script>
+  <div class="card">
+    <div class="ctitle">&#128200; Overall Statistics</div>
+    <div class="stat-grid" id="stat-grid"></div>
+  </div>
+  <div class="card" id="streak-card" style="display:none;">
+    <div class="ctitle">&#128293; Study Streaks</div>
+    <div class="stat-grid" id="streak-grid"></div>
+  </div>
+  <div class="card" id="srs-card" style="display:none;">
+    <div class="ctitle">&#129504; Spaced Repetition</div>
+    <div class="stat-grid" id="srs-grid"></div>
+  </div>
+  <div class="card"><div class="ctitle">&#127919; Domain Performance</div><div class="dom-list" id="prog-doms"></div></div>
+  <div class="card"><div class="ctitle">&#128336; Recent Sessions</div><div class="ses-list" id="ses-list"></div></div>
+  <div style="margin-top:12px;text-align:right;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+    <button class="btn-sec" id="btn-export-pdf" style="">📄 Export PDF</button>
+    <button class="btn-sec" id="btn-export-csv" style="">📊 Export CSV</button>
+    <button class="btn-sec" id="btn-export-json" style="">💾 Export JSON</button>
+    <button class="btn-sec btn-danger" id="btn-clear">&#128465; Reset All Progress</button>
+  </div>
+</div>
+
+<!-- STUDY TOOLS -->
+<div id="pg-tools" class="page">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab" id="t-setup4">&#128203; New Exam</button>
+    <button class="tab" id="t-prog4">&#128200; Progress</button>
+    <button class="tab on" id="t-tools4">&#128295; Study Tools</button>
+    <button class="tab" id="t-appear4">&#127914; Appearance</button>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">&#128295; Interactive Study Tools</div>
+    <p style="font-size:13px;color:var(--tx2);margin-bottom:16px;">Practice with visual simulators, calculators, and flashcards</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;">
+      <button class="tool-btn" onclick="showCalculator()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128208;</div>
+        <div style="font-weight:600;margin-bottom:4px;">Formula Calculator</div>
+        <div style="font-size:12px;opacity:0.8;">Prentice, vergence, transposition, ANSI</div>
+      </button>
+      <button class="tool-btn" onclick="showSimulator()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128300;</div>
+        <div style="font-weight:600;margin-bottom:4px;">Lens Simulator</div>
+        <div style="font-size:12px;opacity:0.8;">Ray tracing visualization</div>
+      </button>
+      <button class="tool-btn" onclick="showFlashcards()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128257;</div>
+        <div style="font-weight:600;margin-bottom:4px;">Flashcard Mode</div>
+        <div style="font-size:12px;opacity:0.8;">Quick review format</div>
+      </button>
+      <button class="tool-btn" onclick="showSRSReview()">
+        <div style="font-size:32px;margin-bottom:8px;">&#129504;</div>
+        <div style="font-weight:600;margin-bottom:4px;">SRS Review</div>
+        <div style="font-size:12px;opacity:0.8;">Questions due today</div>
+      </button>
+    </div>
+  </div>
+  
+  <div id="tool-container" style="display:none;"></div>
+</div>
+
+<!-- APPEARANCE -->
+<div id="pg-appear" class="page">
+  <div class="tabs" role="tablist" aria-label="Navigation">
+    <button class="tab" id="t-setup3">&#128203; New Exam</button>
+    <button class="tab" id="t-prog3">&#128200; Progress</button>
+    <button class="tab" id="t-tools3">&#128295; Study Tools</button>
+    <button class="tab on" id="t-appear3">&#127914; Appearance</button>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">&#127912; Color Theme</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Pick a color scheme. Your choice is saved automatically.</p>
+    <div class="theme-swatches" id="theme-swatches"></div>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">&#128065; Font & Display</div>
+    <div class="sgrid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+      <div class="sbox">
+        <span class="slabel">Dyslexic Font</span>
+        <div class="tog-row">
+          <span class="tog-state" id="dyslexic-state">Off</span>
+          <label class="tog"><input type="checkbox" id="chk-dyslexic"><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">OpenDyslexic typeface</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Font Size</span>
+        <div class="rng-wrap">
+          <input type="range" id="rng-fontsize" min="90" max="130" step="10" value="100">
+          <span class="rng-val" id="rv-fontsize">100%</span>
+        </div>
+        <span class="sbox-desc">Base text size adjustment</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Line Height</span>
+        <div class="seg" id="seg-lineheight">
+          <button class="sgbtn" data-v="compact">Compact</button>
+          <button class="sgbtn on" data-v="normal">Normal</button>
+          <button class="sgbtn" data-v="relaxed">Relaxed</button>
+        </div>
+        <span class="sbox-desc">Text spacing preference</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Letter Spacing</span>
+        <div class="seg" id="seg-letterspacing">
+          <button class="sgbtn on" data-v="normal">Normal</button>
+          <button class="sgbtn" data-v="wide">Wide</button>
+        </div>
+        <span class="sbox-desc">Character spacing</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="ctitle">&#9881; Interface Options</div>
+    <div class="sgrid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+      <div class="sbox">
+        <span class="slabel">Animations</span>
+        <div class="seg" id="seg-animations">
+          <button class="sgbtn" data-v="none">None</button>
+          <button class="sgbtn on" data-v="reduced">Reduced</button>
+          <button class="sgbtn" data-v="full">Full</button>
+        </div>
+        <span class="sbox-desc">Visual motion effects</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Contrast</span>
+        <div class="seg" id="seg-contrast">
+          <button class="sgbtn on" data-v="normal">Normal</button>
+          <button class="sgbtn" data-v="high">High</button>
+        </div>
+        <span class="sbox-desc">Color intensity</span>
+      </div>
+      
+      <div class="sbox">
+        <span class="slabel">Focus Indicators</span>
+        <div class="tog-row">
+          <span class="tog-state on" id="focus-state">On</span>
+          <label class="tog"><input type="checkbox" id="chk-focus" checked><span class="tog-track"></span></label>
+        </div>
+        <span class="sbox-desc">Keyboard navigation aids</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="pg-quiz" class="page">
+  <div id="timer-row" class="timer-row" style="display:none">
+    <div class="tnum" id="tnum" aria-live="polite" aria-label="Time remaining">60</div>
+    <div class="tbar"><div class="tbar-fill" id="tbar-fill" style="width:100%"></div></div>
+  </div>
+  <div class="prog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Quiz progress"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div id="qcard" class="card"></div>
+  <div class="qfoot">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn-sec btn-quit" id="btn-quit" title="Quit exam" style="padding:8px 14px;font-size:12px;">✕ Quit</button>
+      <button class="btn-sec" id="btn-formula" title="Formula Reference (Practice mode only)" style="padding:8px 14px;font-size:12px;display:none;">📐 Formulas</button>
+    </div>
+    <div class="live" id="live-wrap" aria-live="polite" aria-atomic="true">&#10003;&#160;<span class="live-c" id="live-c">0</span>&#160;&#160;&#10007;&#160;<span class="live-w" id="live-w">0</span>&#160;&#160;<span id="live-p" style="color:var(--tx2)">0/0</span></div>
+    <div class="next-row" id="next-row" style="display:none">
+      <span class="kbd">Space</span>&#160;/&#160;<span class="kbd">&#8594;</span>
+      <button class="btn-sec" id="btn-next">Next &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="pg-results" class="page">
+  <div class="card">
+    <div class="res-hero">
+      <div class="ring" id="result-ring" role="img" aria-label="Score"><div class="ring-num" id="ring-num">-</div><div class="ring-lbl">SCORE</div></div>
+      <div class="res-title" id="res-title">-</div>
+      <div class="res-sub" id="res-sub">-</div>
+      <div class="res-grid">
+        <div class="res-box"><div class="res-num" style="color:var(--ok)" id="rs-c">0</div><div class="res-lbl">Correct</div></div>
+        <div class="res-box"><div class="res-num" style="color:var(--bad)" id="rs-w">0</div><div class="res-lbl">Wrong</div></div>
+        <div class="res-box"><div class="res-num" style="color:var(--acc)" id="rs-t">0</div><div class="res-lbl">Total</div></div>
+        <div class="res-box"><div class="res-num" style="color:var(--wrn)" id="rs-time">-</div><div class="res-lbl">Avg Time</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="ctitle">&#128202; Domain Breakdown</div><div class="dom-list" id="res-doms"></div></div>
+  <div class="card"><div class="ctitle">&#128214; Review All Questions</div><div class="rev-list" id="rev-list"></div></div>
+  <div class="act-row">
+    <button class="btn-sec" id="btn-new">&#8592; New Exam</button>
+    <button class="btn-go" id="btn-retry" style="display:none">&#8635; Retry Incorrect</button>
+  </div>
+</div>
+
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Core scripts -->
+  <script src="js/constants.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/appearance.js"></script>
+  <script src="js/formulas.js"></script>
+  
+  <!-- New feature scripts -->
+  <script src="js/srs.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/simulator.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/daily-challenge.js"></script>
+
+  <!-- PWA registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registered:', registration.scope);
+          })
+          .catch(function(err) {
+            console.log('ServiceWorker registration failed:', err);
+          });
+      });
+    }
+  </script>
+
+  <!-- Boot -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      initUI();
+      
+      // Wire formula button
+      var btnFormula = document.getElementById('btn-formula');
+      if (btnFormula) {
+        btnFormula.addEventListener('click', openFormulaModal);
+      }
+      
+      // Show/hide formula button based on exam mode
+      if (examMode === 'practice') {
+        if (btnFormula) btnFormula.style.display = 'block';
+      }
+      
+      // Wire export buttons
+      var btnExportPDF = document.getElementById('btn-export-pdf');
+      var btnExportCSV = document.getElementById('btn-export-csv');
+      var btnExportJSON = document.getElementById('btn-export-json');
+      
+      if (btnExportPDF && typeof Export !== 'undefined') {
+        btnExportPDF.addEventListener('click', function() {
+          Export.viewReport();
+        });
+      }
+      
+      if (btnExportCSV && typeof Export !== 'undefined') {
+        btnExportCSV.addEventListener('click', function() {
+          Export.exportCSV();
+        });
+      }
+      
+      if (btnExportJSON && typeof Export !== 'undefined') {
+        btnExportJSON.addEventListener('click', function() {
+          Export.exportJSON();
+        });
+      }
+      
+      // Initialize Daily Challenge
+      if (typeof DailyChallenge !== 'undefined') {
+        initDailyChallenge();
+      }
+      
+      // Update progress display with new features
+      if (typeof Analytics !== 'undefined') {
+        var streakInfo = Analytics.getStreakInfo();
+        if (streakInfo.currentStreak > 0) {
+          document.getElementById('streak-card').style.display = 'block';
+          document.getElementById('streak-grid').innerHTML = 
+            '<div class="stat"><div class="stat-val">🔥 ' + streakInfo.currentStreak + '</div><div class="stat-lbl">Current Streak</div></div>' +
+            '<div class="stat"><div class="stat-val">🏆 ' + streakInfo.longestStreak + '</div><div class="stat-lbl">Longest Streak</div></div>';
+        }
+      }
+      
+      if (typeof SRS !== 'undefined') {
+        var srsStats = SRS.getStatistics();
+        if (srsStats.totalCards > 0) {
+          document.getElementById('srs-card').style.display = 'block';
+          document.getElementById('srs-grid').innerHTML = 
+            '<div class="stat"><div class="stat-val">' + srsStats.dueToday + '</div><div class="stat-lbl">Due Today</div></div>' +
+            '<div class="stat"><div class="stat-val">' + srsStats.mastered + '</div><div class="stat-lbl">Mastered</div></div>' +
+            '<div class="stat"><div class="stat-val">' + srsStats.totalCards + '</div><div class="stat-lbl">Total Cards</div></div>';
+        }
+      }
+    });
+    
+    // Daily Challenge initialization
+    function initDailyChallenge() {
+      var contentDiv = document.getElementById('daily-challenge-content');
+      if (!contentDiv) return;
+      
+      var isCompleted = DailyChallenge.isCompletedToday();
+      var stats = DailyChallenge.getStats();
+      
+      if (isCompleted) {
+        contentDiv.innerHTML = 
+          '<div style="text-align:center;padding:20px;">' +
+          '<div style="font-size:48px;margin-bottom:12px;">✅</div>' +
+          '<div style="font-size:20px;font-weight:600;margin-bottom:8px;">Challenge Complete!</div>' +
+          '<div style="font-size:14px;opacity:0.9;">Come back tomorrow for a new challenge</div>' +
+          '<div style="margin-top:20px;display:flex;justify-content:center;gap:30px;">' +
+          '<div><div style="font-size:28px;font-weight:bold;">🔥 ' + stats.currentStreak + '</div><div style="font-size:12px;opacity:0.8;">Day Streak</div></div>' +
+          '<div><div style="font-size:28px;font-weight:bold;">🏆 ' + stats.longestStreak + '</div><div style="font-size:12px;opacity:0.8;">Best Streak</div></div>' +
+          '<div><div style="font-size:28px;font-weight:bold;">' + stats.totalCompleted + '</div><div style="font-size:12px;opacity:0.8;">Total Completed</div></div>' +
+          '</div></div>';
+      } else {
+        var question = DailyChallenge.getTodaysQuestion();
+        contentDiv.innerHTML = 
+          '<div style="margin-bottom:16px;">' +
+          '<div style="font-size:14px;opacity:0.9;margin-bottom:12px;">Advanced · Multi-Domain · Real-World Scenario</div>' +
+          '<div style="font-size:16px;font-weight:500;line-height:1.5;margin-bottom:20px;">' + escapeHtml(question.question) + '</div>' +
+          '<div id="daily-options" style="display:grid;gap:10px;"></div>' +
+          '<div id="daily-result" style="margin-top:16px;display:none;"></div>' +
+          '</div>' +
+          '<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:12px;opacity:0.8;">' +
+          '<div>🔥 Streak: ' + stats.currentStreak + ' days</div>' +
+          '<div>🎯 Completed: ' + stats.totalCompleted + ' challenges</div>' +
+          '</div>';
+        
+        var optionsDiv = document.getElementById('daily-options');
+        question.options.forEach(function(opt, idx) {
+          var btn = document.createElement('button');
+          btn.className = 'opt';
+          btn.style.cssText = 'background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;padding:12px;border-radius:8px;text-align:left;cursor:pointer;transition:all 0.2s;';
+          btn.innerHTML = '<span style="font-weight:bold;margin-right:8px;">' + ['A', 'B', 'C', 'D'][idx] + '.</span>' + escapeHtml(opt);
+          btn.onclick = function() { answerDailyChallenge(idx, question); };
+          optionsDiv.appendChild(btn);
+        });
+      }
+    }
+    
+    function answerDailyChallenge(selected, question) {
+      var optionsDiv = document.getElementById('daily-options');
+      var resultDiv = document.getElementById('daily-result');
+      var isCorrect = selected === question.correct;
+      
+      // Disable all buttons
+      Array.from(optionsDiv.children).forEach(function(btn, idx) {
+        btn.disabled = true;
+        btn.style.cursor = 'not-allowed';
+        if (idx === question.correct) {
+          btn.style.background = 'rgba(72,187,120,0.3)';
+          btn.style.borderColor = 'rgba(72,187,120,0.8)';
+        } else if (idx === selected && !isCorrect) {
+          btn.style.background = 'rgba(245,101,101,0.3)';
+          btn.style.borderColor = 'rgba(245,101,101,0.8)';
+        }
+      });
+      
+      // Mark as completed
+      DailyChallenge.markCompleted(isCorrect);
+      
+      // Show result
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = 
+        '<div style="background:rgba(255,255,255,0.15);padding:16px;border-radius:8px;">' +
+        '<div style="font-size:18px;font-weight:600;margin-bottom:8px;">' + (isCorrect ? '✅ Correct!' : '❌ Incorrect') + '</div>' +
+        '<div style="font-size:14px;opacity:0.95;line-height:1.6;">' + escapeHtml(question.explanation) + '</div>' +
+        '<div style="margin-top:12px;font-size:12px;opacity:0.8;">Source: ' + escapeHtml(question.source) + '</div>' +
+        '</div>';
+    }
+    
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Tool functions
+    function showCalculator() {
+      if (typeof Calculator !== 'undefined') {
+        document.getElementById('tool-container').style.display = 'block';
+        Calculator.generateUI('tool-container');
+      }
+    }
+    
+    function showSimulator() {
+      if (typeof Simulator !== 'undefined') {
+        document.getElementById('tool-container').style.display = 'block';
+        Simulator.generateUI('tool-container');
+      }
+    }
+    
+    function showFlashcards() {
+      if (typeof Flashcards !== 'undefined' && typeof BANK !== 'undefined') {
+        document.getElementById('tool-container').style.display = 'block';
+        Flashcards.init(BANK.slice(0, 20));
+        Flashcards.generateUI('tool-container');
+        Flashcards.updateDisplay();
+      }
+    }
+    
+    function showSRSReview() {
+      if (typeof SRS !== 'undefined' && typeof BANK !== 'undefined') {
+        var dueQuestions = SRS.getDueQuestions(BANK);
+        alert('You have ' + dueQuestions.length + ' questions due for review today!');
+        // TODO: Start quiz with due questions
+      }
+    }
+  </script>
+
 </body>
 </html>
